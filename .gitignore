@@ -42,3 +42,6 @@ application-local.properties
 docs/superpowers/
 docs/notes/
 *.local.md
+
+### Dataset (Kaggle RT-IoT2022 — repoya konmaz) ###
+data/*.csv
