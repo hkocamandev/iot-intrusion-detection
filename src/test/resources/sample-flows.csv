@@ -1,0 +1,4 @@
+proto,service,flow_duration,fwd_pkts_tot,bwd_pkts_tot,Attack_type
+tcp,http,1.5,10,8,Normal
+udp,dns,0.2,2,2,DOS_SYN_Hping
+tcp,-,3.4,40,0,NMAP_TCP_scan

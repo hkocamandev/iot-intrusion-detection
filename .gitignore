@@ -37,3 +37,11 @@ build/
 .env
 *.class
 application-local.properties
+
+### Local-only docs & notes (never pushed to GitHub) ###
+docs/superpowers/
+docs/notes/
+*.local.md
+
+### Dataset (Kaggle RT-IoT2022 — repoya konmaz) ###
+data/*.csv
