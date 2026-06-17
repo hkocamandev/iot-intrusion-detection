@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: iot-intrusion-detection
+  datasource:
+    url: jdbc:postgresql://localhost:5432/iot_ids
+    username: iot
+    password: iot
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.format_sql: true
+    open-in-view: false
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: iot-ids
+      auto-offset-reset: earliest
+      properties:
+        spring.json.trusted.packages: "com.github.hkocamandev.iot_intrusion_detection.dto"
+    producer:
+      acks: all
+
+app:
+  topics:
+    traffic-raw: iot.traffic.raw
+  simulator:
+    enabled: false
+    csv-path: data/RT_IOT2022.csv
+    delay-ms: 50
