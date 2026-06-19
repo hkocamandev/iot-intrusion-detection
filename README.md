@@ -14,6 +14,21 @@ A `CsvReplaySimulator` reads the RT-IoT2022 CSV schema-agnostically and publishe
 flow as a `TrafficEvent` to the `iot.traffic.raw` topic (keyed by source). `StorageConsumer`
 consumes the topic and persists each flow into the `network_flows` table.
 
+## Phase 2 — Rule-based detection
+
+```
+                         ┌─ StorageConsumer (group: storage)        -> network_flows
+iot.traffic.raw  ────────┤
+                         └─ RuleBasedConsumer (group: rule-engine)  -> iot.alerts
+                                                                          │
+                                              AlertConsumer (group: alert-processor) -> alerts
+                                              (retry + dead-letter: iot.alerts-dlt)
+```
+
+Rules are config-driven thresholds defined under `app.rules` in `application.yml`, so new
+detections are added without code changes. Because `rule-engine` is a separate consumer
+group from `storage`, both consumers independently receive every traffic message.
+
 ## Tech stack
 
 - Java 21, Spring Boot 4.1
@@ -39,9 +54,7 @@ To replay the dataset, see `data/README.md`, then set `app.simulator.enabled=tru
 Integration tests spin up real Kafka and PostgreSQL containers via Testcontainers,
 so Docker must be running.
 
-## Learning notes (Kafka)
+## Notes
 
-- The same topic can be read independently by different consumer groups.
-- `iot.traffic.raw` uses 3 partitions; messages are keyed by source so a given source's
-  flows stay ordered within a partition.
-- Use kafka-ui (http://localhost:8085) to inspect topics, messages, partitions and offsets.
+Implementation and learning notes are maintained locally and are intentionally excluded
+from version control.
