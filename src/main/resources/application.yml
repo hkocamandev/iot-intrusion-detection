@@ -32,3 +32,14 @@ app:
     enabled: false
     csv-path: data/RT_IOT2022.csv
     delay-ms: 50
+  rules:
+    - name: dos-high-packet-rate
+      feature: fwd_pkts_tot
+      threshold: 1000
+      attack-type: DOS
+      severity: HIGH
+    - name: recon-long-flow
+      feature: flow_duration
+      threshold: 60
+      attack-type: RECON
+      severity: MEDIUM
