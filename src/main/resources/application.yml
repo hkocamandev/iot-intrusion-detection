@@ -28,6 +28,7 @@ spring:
 app:
   topics:
     traffic-raw: iot.traffic.raw
+    alerts: iot.alerts
   simulator:
     enabled: false
     csv-path: data/RT_IOT2022.csv

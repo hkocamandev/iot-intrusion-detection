@@ -13,4 +13,9 @@ public class KafkaTopicConfig {
     NewTopic trafficRawTopic(@Value("${app.topics.traffic-raw}") String name) {
         return TopicBuilder.name(name).partitions(3).replicas(1).build();
     }
+
+    @Bean
+    NewTopic alertsTopic(@Value("${app.topics.alerts}") String name) {
+        return TopicBuilder.name(name).partitions(3).replicas(1).build();
+    }
 }
