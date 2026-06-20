@@ -29,6 +29,26 @@ Rules are config-driven thresholds defined under `app.rules` in `application.yml
 detections are added without code changes. Because `rule-engine` is a separate consumer
 group from `storage`, both consumers independently receive every traffic message.
 
+## Phase 3 — ML-based detection
+
+```
+                ┌─ StorageConsumer    (group: storage)     -> network_flows
+iot.traffic.raw ┼─ RuleBasedConsumer  (group: rule-engine) -> iot.alerts (RULE)
+                └─ MlBasedConsumer    (group: ml-engine)   -> ml-service /predict
+                                                                 │  attack_type != NORMAL
+                                                                 ▼
+                                                             iot.alerts (ML)
+```
+
+A Python FastAPI service (`ml-service/`) serves an XGBoost classifier trained offline
+(`train.py`, on RT-IoT2022 if present, otherwise on synthetic labeled data). `MlBasedConsumer`
+reads `iot.traffic.raw` under its own consumer group, calls the model over REST with a timeout,
+and publishes `detectionSource=ML` alerts. If the ML service is unavailable the call falls back
+silently — storage and rule-based detection are unaffected. ML can be toggled with `app.ml.enabled`.
+
+Run the ML service with `docker compose up -d --build ml-service` (or locally: `cd ml-service &&
+pip install -r requirements.txt && python train.py && uvicorn app:app --port 8000`).
+
 ## Tech stack
 
 - Java 21, Spring Boot 4.1

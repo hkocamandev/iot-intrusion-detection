@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -39,6 +40,7 @@ import static org.mockito.Mockito.doThrow;
 
 @SpringBootTest
 @Import({TestcontainersConfiguration.class, AlertDlqIT.DltCapture.class})
+@TestPropertySource(properties = "app.ml.enabled=false")
 class AlertDlqIT {
 
     private static final String POISON_SOURCE_ID = "poison-alert-dlt-probe";

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -20,6 +21,7 @@ import static org.awaitility.Awaitility.await;
 
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
+@TestPropertySource(properties = "app.ml.enabled=false")
 class StorageConsumerIT {
 
     @Autowired TrafficProducer producer;

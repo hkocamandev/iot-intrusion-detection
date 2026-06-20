@@ -43,6 +43,17 @@ services:
     volumes:
       - iot_pgdata:/var/lib/postgresql/data
 
+  ml-service:
+    build: ./ml-service
+    container_name: iot-ml-service
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0) if urllib.request.urlopen('http://localhost:8000/health').status==200 else sys.exit(1)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
 volumes:
   iot_pgdata:
   iot_kafkadata:
