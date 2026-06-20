@@ -45,3 +45,15 @@ app:
       threshold: 60
       attack-type: RECON
       severity: MEDIUM
+  ml:
+    enabled: true
+    url: http://localhost:8000
+    timeout-ms: 2000
+    min-score: 0.5
+    severity-by-type:
+      DOS: HIGH
+      DDOS: CRITICAL
+      PORT_SCAN: MEDIUM
+      RECON: MEDIUM
+      BRUTE_FORCE: HIGH
+      OTHER: LOW
