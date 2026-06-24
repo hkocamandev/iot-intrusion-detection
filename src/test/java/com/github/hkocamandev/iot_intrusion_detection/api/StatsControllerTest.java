@@ -1,7 +1,6 @@
 package com.github.hkocamandev.iot_intrusion_detection.api;
 
 import com.github.hkocamandev.iot_intrusion_detection.dto.StatsResponse;
-import com.github.hkocamandev.iot_intrusion_detection.repository.AlertRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -19,7 +18,6 @@ class StatsControllerTest {
 
     @Autowired MockMvc mockMvc;
     @MockitoBean AlertStatsService statsService;
-    @MockitoBean AlertRepository alertRepository;
 
     @Test
     void returnsStats() throws Exception {

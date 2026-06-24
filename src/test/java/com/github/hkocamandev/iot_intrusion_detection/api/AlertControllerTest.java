@@ -22,7 +22,6 @@ class AlertControllerTest {
 
     @Autowired MockMvc mockMvc;
     @MockitoBean AlertRepository repository;
-    @MockitoBean AlertStatsService alertStatsService;
 
     private Alert alert() {
         return new Alert(Instant.parse("2026-06-20T10:00:00Z"), "src-1", DetectionSource.RULE,
