@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>IoT Intrusion Detection — Dashboard</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 1.5rem; background:#0f1419; color:#e6e6e6; }
+    h1 { font-size: 1.3rem; }
+    .counters { display:flex; gap:1rem; margin:1rem 0; }
+    .card { background:#1b2330; border-radius:8px; padding:0.8rem 1.2rem; }
+    .card .n { font-size:1.6rem; font-weight:700; }
+    .charts { display:flex; gap:1.5rem; flex-wrap:wrap; margin:1rem 0; }
+    .chart-box { background:#1b2330; border-radius:8px; padding:1rem; width:320px; }
+    table { width:100%; border-collapse:collapse; margin-top:1rem; }
+    th, td { text-align:left; padding:0.4rem 0.6rem; border-bottom:1px solid #2a3442; font-size:0.9rem; }
+    .sev-HIGH, .sev-CRITICAL { color:#ff6b6b; }
+    .sev-MEDIUM { color:#ffd166; }
+    .src-ML { color:#7cc4ff; }
+  </style>
+</head>
+<body>
+  <h1>IoT Intrusion Detection — Live Dashboard</h1>
+  <div class="counters">
+    <div class="card"><div>Total</div><div class="n" id="c-total">0</div></div>
+    <div class="card"><div>High+</div><div class="n" id="c-high">0</div></div>
+    <div class="card"><div>Live</div><div class="n" id="c-live">0</div></div>
+  </div>
+  <div class="charts">
+    <div class="chart-box"><canvas id="chart-type"></canvas></div>
+    <div class="chart-box"><canvas id="chart-severity"></canvas></div>
+    <div class="chart-box"><canvas id="chart-source"></canvas></div>
+  </div>
+  <h2>Recent alerts</h2>
+  <table>
+    <thead><tr><th>Time</th><th>Source</th><th>Type</th><th>Severity</th><th>Detector</th><th>Score</th><th>Rule</th></tr></thead>
+    <tbody id="alert-rows"></tbody>
+  </table>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

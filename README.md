@@ -49,6 +49,21 @@ silently — storage and rule-based detection are unaffected. ML can be toggled 
 Run the ML service with `docker compose up -d --build ml-service` (or locally: `cd ml-service &&
 pip install -r requirements.txt && python train.py && uvicorn app:app --port 8000`).
 
+## Phase 4 — REST API, WebSocket & dashboard
+
+```
+iot.alerts ─┬─ AlertConsumer        (group: alert-processor) -> alerts table
+            └─ AlertWebSocketConsumer (group: dashboard)     -> STOMP /topic/alerts -> browser
+```
+
+A read-only REST API exposes recent alerts (`GET /api/alerts`, optional `?severity=`) and
+aggregate stats (`GET /api/stats`). A new `dashboard` consumer group relays each alert over
+STOMP/WebSocket (`/ws` → `/topic/alerts`). The static dashboard (`src/main/resources/static/`,
+Chart.js) shows a live alerts table fed by WebSocket plus charts refreshed from `/api/stats`.
+
+Run the app (`./mvnw spring-boot:run`) and open `http://localhost:8080/`. Publish traffic to
+`iot.traffic.raw` (see Phase 1) to see rule-based and ML alerts appear live.
+
 ## Tech stack
 
 - Java 21, Spring Boot 4.1
