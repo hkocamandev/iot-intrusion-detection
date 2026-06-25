@@ -40,4 +40,19 @@ class AlertQueryToolsTest {
         assertThat(rows).hasSize(1);
         assertThat(rows.get(0)).contains("DOS").contains("HIGH");
     }
+
+    @Test
+    void recentAlertsTruncatesToLimit() {
+        Alert a1 = new Alert(Instant.parse("2026-06-20T10:00:00Z"), "src-1", DetectionSource.ML,
+                AttackType.DOS, Severity.HIGH, 0.91, "ml-xgboost", "tcp", "http", null);
+        Alert a2 = new Alert(Instant.parse("2026-06-21T10:00:00Z"), "src-2", DetectionSource.RULE,
+                AttackType.RECON, Severity.MEDIUM, 0.75, "rule-1", "udp", "dns", null);
+        Alert a3 = new Alert(Instant.parse("2026-06-22T10:00:00Z"), "src-3", DetectionSource.ML,
+                AttackType.PORT_SCAN, Severity.LOW, 0.45, "ml-isolation-forest", "tcp", "ssh", null);
+        when(repository.findTop100ByOrderByCreatedAtDesc()).thenReturn(List.of(a1, a2, a3));
+
+        List<String> rows = tools.recentAlerts(2);
+
+        assertThat(rows).hasSize(2);
+    }
 }
