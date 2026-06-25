@@ -1,5 +1,7 @@
 package com.github.hkocamandev.iot_intrusion_detection.config;
 
+import com.github.hkocamandev.iot_intrusion_detection.llm.AlertQueryTools;
+import com.github.hkocamandev.iot_intrusion_detection.llm.Assistant;
 import com.github.hkocamandev.iot_intrusion_detection.llm.SecurityAnalyst;
 import dev.langchain4j.model.anthropic.AnthropicChatModel;
 import dev.langchain4j.model.chat.ChatModel;
@@ -27,5 +29,13 @@ public class LlmConfig {
     @Bean
     public SecurityAnalyst securityAnalyst(ChatModel chatModel) {
         return AiServices.create(SecurityAnalyst.class, chatModel);
+    }
+
+    @Bean
+    public Assistant assistant(ChatModel chatModel, AlertQueryTools alertQueryTools) {
+        return AiServices.builder(Assistant.class)
+                .chatModel(chatModel)
+                .tools(alertQueryTools)
+                .build();
     }
 }
