@@ -57,3 +57,10 @@ app:
       RECON: MEDIUM
       BRUTE_FORCE: HIGH
       OTHER: LOW
+  llm:
+    enabled: true
+    model: claude-haiku-4-5
+    timeout: 30s
+    enrichment:
+      batch-size: 10
+      poll-interval: 10s
