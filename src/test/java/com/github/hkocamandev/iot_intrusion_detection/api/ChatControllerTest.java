@@ -12,6 +12,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -47,5 +48,21 @@ class ChatControllerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
         assertThat(response.getBody().answer()).contains("disabled");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void returns503WhenServiceThrows() {
+        NlQueryService throwingService = mock(NlQueryService.class);
+        when(throwingService.ask(anyString())).thenThrow(new RuntimeException("timeout"));
+        ObjectProvider<NlQueryService> provider = mock(ObjectProvider.class);
+        when(provider.getIfAvailable()).thenReturn(throwingService);
+        ChatController controller = new ChatController(provider);
+
+        ResponseEntity<ChatResponse> response =
+                controller.chat(new com.github.hkocamandev.iot_intrusion_detection.dto.ChatRequest("hi"));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+        assertThat(response.getBody().answer()).contains("unavailable");
     }
 }

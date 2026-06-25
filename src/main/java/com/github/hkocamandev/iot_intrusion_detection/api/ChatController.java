@@ -3,6 +3,8 @@ package com.github.hkocamandev.iot_intrusion_detection.api;
 import com.github.hkocamandev.iot_intrusion_detection.dto.ChatRequest;
 import com.github.hkocamandev.iot_intrusion_detection.dto.ChatResponse;
 import com.github.hkocamandev.iot_intrusion_detection.llm.NlQueryService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/chat")
 public class ChatController {
+
+    private static final Logger log = LoggerFactory.getLogger(ChatController.class);
 
     private final ObjectProvider<NlQueryService> nlQueryService;
 
@@ -33,8 +37,9 @@ public class ChatController {
         try {
             return ResponseEntity.ok(new ChatResponse(service.ask(request.question())));
         } catch (Exception e) {
+            log.warn("LLM chat failed", e);
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                    .body(new ChatResponse("LLM chat failed: " + e.getMessage()));
+                    .body(new ChatResponse("LLM chat temporarily unavailable."));
         }
     }
 }
