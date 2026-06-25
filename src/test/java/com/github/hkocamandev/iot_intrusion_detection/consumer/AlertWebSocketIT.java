@@ -38,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestcontainersConfiguration.class)
-@TestPropertySource(properties = "app.ml.enabled=false")
+@TestPropertySource(properties = {"app.ml.enabled=false", "app.llm.enabled=false"})
 class AlertWebSocketIT {
 
     @LocalServerPort int port;
