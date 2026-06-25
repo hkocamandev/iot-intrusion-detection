@@ -47,4 +47,25 @@ class AlertViewTest {
         assertThat(view.protocol()).isEqualTo("tcp");
         assertThat(view.service()).isEqualTo("http");
     }
+
+    @Test
+    void fromAlertIncludesLlmEnrichment() {
+        Instant t = Instant.parse("2026-06-20T11:00:00Z");
+        Alert alert = new Alert(t, "src-3", DetectionSource.ML, AttackType.DOS,
+                Severity.HIGH, 0.9, "ml-xgboost", "tcp", "http", null);
+        alert.applyLlmEnrichment("why it fired", "what to do", t);
+
+        AlertView view = AlertView.from(alert);
+
+        assertThat(view.llmExplanation()).isEqualTo("why it fired");
+        assertThat(view.llmRecommendation()).isEqualTo("what to do");
+    }
+
+    @Test
+    void fromAlertEventLeavesLlmFieldsNull() {
+        AlertView view = AlertView.from(new AlertEvent(Instant.now(), "s", DetectionSource.ML,
+                AttackType.DOS, Severity.HIGH, 0.5, "r", "tcp", "http", null));
+        assertThat(view.llmExplanation()).isNull();
+        assertThat(view.llmRecommendation()).isNull();
+    }
 }

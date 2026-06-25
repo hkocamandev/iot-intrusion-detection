@@ -58,6 +58,12 @@ public class Alert {
         this.trueLabel = trueLabel;
     }
 
+    public void applyLlmEnrichment(String explanation, String recommendation, Instant enrichedAt) {
+        this.llmExplanation = explanation;
+        this.llmRecommendation = recommendation;
+        this.llmEnrichedAt = enrichedAt;
+    }
+
     public Long getId() { return id; }
     public Instant getCreatedAt() { return createdAt; }
     public String getSourceId() { return sourceId; }

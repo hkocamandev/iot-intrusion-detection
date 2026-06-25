@@ -64,6 +64,38 @@ Chart.js) shows a live alerts table fed by WebSocket plus charts refreshed from 
 Run the app (`./mvnw spring-boot:run`) and open `http://localhost:8080/`. Publish traffic to
 `iot.traffic.raw` (see Phase 1) to see rule-based and ML alerts appear live.
 
+## Phase 5 — LLM enrichment and natural-language chat
+
+```
+alerts table  -->  AlertEnrichmentScheduler  -->  SecurityAnalystService  -->  alerts.llm_explanation / llm_recommendation
+```
+
+**Scheduled enrichment poller:** A background scheduler polls for alerts that have no LLM
+explanation yet (ordered by creation time, configurable batch size) and calls
+`SecurityAnalystService` for each one. The service sends alert metadata to an LLM and writes
+the returned `explanation` and `recommendation` back to the `alerts` table via
+`applyLlmEnrichment`. Per-alert errors are caught and logged so a single failure does not
+stop the batch.
+
+**Natural-language chat (`POST /api/chat`):** `NlQueryService` wires an LLM assistant with
+tool-calling over the existing REST query layer (`AlertQueryTools`). The assistant can answer
+questions such as "how many HIGH alerts in the last hour?" by invoking the right query tool and
+returning a plain-language answer. When LLM is disabled the endpoint returns `503 Service
+Unavailable`.
+
+**Configuration (`application.yml`):**
+
+| Key | Purpose |
+|-----|---------|
+| `app.llm.enabled` | Enable/disable all LLM features (default `false`) |
+| `app.llm.model` | LLM model identifier |
+| `app.llm.timeout` | Per-call timeout |
+| `app.llm.enrichment.batch-size` | Alerts processed per scheduler tick |
+| `app.llm.enrichment.poll-interval` | Scheduler polling interval |
+
+**Runtime requirement:** set `ANTHROPIC_API_KEY` in the environment to use LLM features.
+The test suite runs with `app.llm.enabled=false` and requires no API key.
+
 ## Tech stack
 
 - Java 21, Spring Boot 4.1

@@ -22,7 +22,7 @@ import static org.awaitility.Awaitility.await;
 
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
-@TestPropertySource(properties = "app.ml.enabled=false")
+@TestPropertySource(properties = {"app.ml.enabled=false", "app.llm.enabled=false"})
 class RuleBasedFlowIT {
 
     @Autowired TrafficProducer trafficProducer;

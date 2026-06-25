@@ -40,7 +40,7 @@ import static org.mockito.Mockito.doThrow;
 
 @SpringBootTest
 @Import({TestcontainersConfiguration.class, AlertDlqIT.DltCapture.class})
-@TestPropertySource(properties = "app.ml.enabled=false")
+@TestPropertySource(properties = {"app.ml.enabled=false", "app.llm.enabled=false"})
 class AlertDlqIT {
 
     private static final String POISON_SOURCE_ID = "poison-alert-dlt-probe";

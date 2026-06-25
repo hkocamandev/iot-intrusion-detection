@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -29,6 +30,7 @@ import static org.awaitility.Awaitility.await;
 
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
+@TestPropertySource(properties = "app.llm.enabled=false")
 class MlFallbackIT {
 
     static final MockWebServer mlServer = new MockWebServer();

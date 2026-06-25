@@ -19,17 +19,19 @@ public record AlertView(
         double score,
         String ruleName,
         String protocol,
-        String service
+        String service,
+        String llmExplanation,
+        String llmRecommendation
 ) {
     public static AlertView from(Alert a) {
         return new AlertView(a.getId(), a.getCreatedAt(), a.getSourceId(), a.getDetectionSource(),
                 a.getAttackType(), a.getSeverity(), a.getScore(), a.getRuleName(),
-                a.getProtocol(), a.getService());
+                a.getProtocol(), a.getService(), a.getLlmExplanation(), a.getLlmRecommendation());
     }
 
     public static AlertView from(AlertEvent e) {
         return new AlertView(null, e.detectedAt(), e.sourceId(), e.detectionSource(),
                 e.attackType(), e.severity(), e.score(), e.ruleName(),
-                e.protocol(), e.service());
+                e.protocol(), e.service(), null, null);
     }
 }
