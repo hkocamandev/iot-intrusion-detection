@@ -103,10 +103,37 @@ The test suite runs with `app.llm.enabled=false` and requires no API key.
 - PostgreSQL 16 (JSONB feature storage)
 - Testcontainers for integration tests
 
+## Configuration
+
+Runtime configuration is supplied through environment variables. The committed
+[`.env.example`](.env.example) documents every supported variable with its default value.
+
+1. Copy the template to a local `.env` (which is gitignored):
+
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Fill in the values. Everything has a working default that matches the bundled
+   `docker compose` stack, so the only one you normally need to set is
+   `ANTHROPIC_API_KEY` (required for the LLM features). To turn the LLM on, also set
+   `APP_LLM_ENABLED=true`.
+
+3. Load `.env` into your shell before starting the app — Spring Boot does **not** read
+   `.env` automatically:
+
+   ```bash
+   set -a; source .env; set +a
+   ```
+
+**Never commit `.env` or a real key.** `ANTHROPIC_API_KEY` is billed per token on the
+Anthropic Developer Platform, separate from any Claude Pro subscription.
+
 ## Running locally
 
 ```bash
 docker compose up -d        # kafka, kafka-ui (:8085), postgres (:5432)
+set -a; source .env; set +a # load your environment (see Configuration above)
 ./mvnw spring-boot:run      # application (:8080)
 ```
 
