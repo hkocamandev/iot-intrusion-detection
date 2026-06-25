@@ -58,7 +58,7 @@ app:
       BRUTE_FORCE: HIGH
       OTHER: LOW
   llm:
-    enabled: true
+    enabled: false
     model: claude-haiku-4-5
     timeout: 30s
     enrichment:
