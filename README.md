@@ -2,7 +2,76 @@
 
 A Kafka-based streaming system that performs near real-time intrusion detection on
 RT-IoT2022 network traffic. Built with Spring Boot producers/consumers, PostgreSQL,
-rule-based and ML-based anomaly detection, a REST API and a live dashboard.
+rule-based and ML-based anomaly detection, a REST API with a live dashboard, and an
+LLM layer (alert enrichment + natural-language chat) that runs on a free provider.
+
+## Demo
+
+### Live dashboard
+
+![Live dashboard](screenshots/dashboard.png)
+
+Real-time alert table (fed over WebSocket) with severity, detector (RULE / ML) and score,
+plus live charts by attack type, severity, and detection source.
+
+### Streaming architecture
+
+```mermaid
+flowchart LR
+  SRC["traffic source / CSV"] -->|produce| T1[("iot.traffic.raw")]
+  T1 --> SC["StorageConsumer<br/>(group: storage)"] --> PG[("PostgreSQL<br/>network_flows")]
+  T1 --> RC["RuleBasedConsumer<br/>(group: rule-engine)"]
+  T1 --> MC["MlBasedConsumer<br/>(group: ml-engine)"]
+  MC -->|"REST /predict"| ML["ML service<br/>FastAPI + XGBoost"]
+  RC -->|RULE| T2[("iot.alerts")]
+  MC -->|ML| T2
+  T2 --> AC["AlertConsumer<br/>(group: alert-processor)"] --> AL[("PostgreSQL<br/>alerts")]
+  T2 --> WS["AlertWebSocketConsumer<br/>(group: dashboard)"] --> UI["live dashboard"]
+  AC -.->|"retry + DLQ"| DLT[("iot.alerts-dlt")]
+  AL --> EN["AlertEnrichmentScheduler"] -->|LLM| LLMP["Groq / Gemini / Anthropic"] --> AL
+```
+
+Each detector is its own Kafka consumer group, so storage, rule-based and ML detection
+independently receive every traffic message; alert delivery uses a retry topic and a
+dead-letter topic.
+
+![Kafka topics](screenshots/kafka-ui.png)
+
+### ML detection service
+
+A FastAPI + XGBoost microservice classifies each flow.
+
+![ML service API](screenshots/ml-swagger.png)
+
+```bash
+curl -s -X POST localhost:8000/predict -H "Content-Type: application/json" \
+  -d '{"features": {"fwd_pkts_tot": 1500, "flow_duration": 2.3}}'
+# {"attack_type": "PORT_SCAN", "score": 0.826}
+```
+
+### LLM enrichment & natural-language chat (free — runs on Groq by default)
+
+A scheduled poller enriches each alert with a plain-language explanation and recommendation:
+
+```json
+{
+  "attackType": "DDOS", "severity": "MEDIUM", "detectionSource": "ML",
+  "llmExplanation": "A medium-severity DDoS attack is detected, targeting DNS services over UDP, indicating potential reconnaissance activity.",
+  "llmRecommendation": "Verify DNS server logs and implement rate limiting on UDP traffic to prevent abuse."
+}
+```
+
+Ask questions in plain language — the assistant tool-calls the alert queries to answer:
+
+```bash
+curl -s -X POST localhost:8080/api/chat -H "Content-Type: application/json" \
+  -d '{"question": "Give me an overall threat summary."}'
+# {"answer": "There have been a total of 24 alerts detected, with 12 from rule-based detection
+#   and 12 from machine learning-based detection ... 4 alerts of each type ... 6 of each severity."}
+```
+
+The provider is configurable (`app.llm.provider = groq | gemini | anthropic`); Groq's free
+tier needs no credit card. See [Configuration](#configuration).
 
 ## Architecture (Phase 1 — ingest & store)
 
