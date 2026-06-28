@@ -15,14 +15,23 @@ function refreshChart(chart, map) {
   chart.update();
 }
 
+// Escape any value before it is interpolated into HTML. Alert fields such as
+// sourceId originate from network traffic and are attacker-controlled, so they
+// must never be inserted into the DOM as raw markup (stored XSS).
+function esc(v) {
+  return String(v ?? '').replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
 function row(a) {
   const time = a.createdAt ? new Date(a.createdAt).toLocaleTimeString() : '';
   const score = (a.score == null) ? '' : a.score.toFixed(2);
   return `<tr>
-    <td>${time}</td><td>${a.sourceId ?? ''}</td><td>${a.attackType ?? ''}</td>
-    <td class="sev-${a.severity}">${a.severity ?? ''}</td>
-    <td class="src-${a.detectionSource}">${a.detectionSource ?? ''}</td>
-    <td>${score}</td><td>${a.ruleName ?? ''}</td></tr>`;
+    <td>${esc(time)}</td><td>${esc(a.sourceId)}</td><td>${esc(a.attackType)}</td>
+    <td class="sev-${esc(a.severity)}">${esc(a.severity)}</td>
+    <td class="src-${esc(a.detectionSource)}">${esc(a.detectionSource)}</td>
+    <td>${esc(score)}</td><td>${esc(a.ruleName)}</td></tr>`;
 }
 
 function prependRow(a) {
