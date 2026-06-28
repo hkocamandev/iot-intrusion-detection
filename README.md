@@ -115,9 +115,10 @@ Runtime configuration is supplied through environment variables. The committed
    ```
 
 2. Fill in the values. Everything has a working default that matches the bundled
-   `docker compose` stack, so the only one you normally need to set is
-   `ANTHROPIC_API_KEY` (required for the LLM features). To turn the LLM on, also set
-   `APP_LLM_ENABLED=true`.
+   `docker compose` stack. To use the LLM features, choose a provider with
+   `APP_LLM_PROVIDER` (`gemini` by default, or `anthropic`), set that provider's API
+   key (`GEMINI_API_KEY` — free at https://aistudio.google.com — or
+   `ANTHROPIC_API_KEY`), and set `APP_LLM_ENABLED=true`.
 
 3. Load `.env` into your shell before starting the app — Spring Boot does **not** read
    `.env` automatically:
@@ -126,8 +127,9 @@ Runtime configuration is supplied through environment variables. The committed
    set -a; source .env; set +a
    ```
 
-**Never commit `.env` or a real key.** `ANTHROPIC_API_KEY` is billed per token on the
-Anthropic Developer Platform, separate from any Claude Pro subscription.
+**Never commit `.env` or a real key.** Gemini has a free tier (no credit card);
+`ANTHROPIC_API_KEY` is billed per token on the Anthropic Developer Platform,
+separate from any Claude Pro subscription.
 
 ## Running locally
 
