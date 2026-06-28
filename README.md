@@ -88,7 +88,8 @@ Unavailable`.
 | Key | Purpose |
 |-----|---------|
 | `app.llm.enabled` | Enable/disable all LLM features (default `false`) |
-| `app.llm.provider` | LLM provider: `gemini` (default) or `anthropic` |
+| `app.llm.provider` | LLM provider: `groq` (default), `gemini`, or `anthropic` |
+| `app.llm.groq.model` | Groq model id |
 | `app.llm.gemini.model` | Gemini model id |
 | `app.llm.anthropic.model` | Anthropic model id |
 | `app.llm.timeout` | Per-call timeout |
@@ -119,8 +120,8 @@ Runtime configuration is supplied through environment variables. The committed
 
 2. Fill in the values. Everything has a working default that matches the bundled
    `docker compose` stack. To use the LLM features, choose a provider with
-   `APP_LLM_PROVIDER` (`gemini` by default, or `anthropic`), set that provider's API
-   key (`GEMINI_API_KEY` — free at https://aistudio.google.com — or
+   `APP_LLM_PROVIDER` (`groq` by default, or `gemini` / `anthropic`), set that provider's
+   API key (`GROQ_API_KEY` — free at https://console.groq.com — `GEMINI_API_KEY`, or
    `ANTHROPIC_API_KEY`), and set `APP_LLM_ENABLED=true`.
 
 3. Load `.env` into your shell before starting the app — Spring Boot does **not** read

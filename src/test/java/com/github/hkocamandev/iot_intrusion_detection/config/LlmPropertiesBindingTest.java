@@ -19,7 +19,8 @@ class LlmPropertiesBindingTest {
                     "app.llm.enrichment.batch-size=10",
                     "app.llm.enrichment.poll-interval=10s",
                     "app.llm.anthropic.model=claude-haiku-4-5",
-                    "app.llm.gemini.model=gemini-2.0-flash");
+                    "app.llm.gemini.model=gemini-2.0-flash",
+                    "app.llm.groq.model=llama-3.3-70b-versatile");
 
     @EnableConfigurationProperties(LlmProperties.class)
     static class Config { }
@@ -35,6 +36,7 @@ class LlmPropertiesBindingTest {
             assertThat(props.enrichment().pollInterval()).isEqualTo(Duration.ofSeconds(10));
             assertThat(props.anthropic().model()).isEqualTo("claude-haiku-4-5");
             assertThat(props.gemini().model()).isEqualTo("gemini-2.0-flash");
+            assertThat(props.groq().model()).isEqualTo("llama-3.3-70b-versatile");
         });
     }
 }

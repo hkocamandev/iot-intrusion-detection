@@ -59,7 +59,7 @@ app:
       OTHER: LOW
   llm:
     enabled: false
-    provider: gemini          # anthropic | gemini
+    provider: groq            # anthropic | gemini | groq
     timeout: 30s
     enrichment:
       batch-size: 10
@@ -68,3 +68,5 @@ app:
       model: claude-haiku-4-5
     gemini:
       model: gemini-2.0-flash
+    groq:
+      model: llama-3.3-70b-versatile

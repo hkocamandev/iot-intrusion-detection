@@ -12,11 +12,14 @@ public record LlmProperties(
         Duration timeout,
         Enrichment enrichment,
         Anthropic anthropic,
-        Gemini gemini
+        Gemini gemini,
+        Groq groq
 ) {
     public record Enrichment(int batchSize, Duration pollInterval) { }
 
     public record Anthropic(String model) { }
 
     public record Gemini(String model) { }
+
+    public record Groq(String model) { }
 }

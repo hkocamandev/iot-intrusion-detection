@@ -12,7 +12,8 @@ class LlmConfigTest {
         return new LlmProperties(true, provider, Duration.ofSeconds(30),
                 new LlmProperties.Enrichment(10, Duration.ofSeconds(10)),
                 new LlmProperties.Anthropic("claude-haiku-4-5"),
-                new LlmProperties.Gemini("gemini-2.0-flash"));
+                new LlmProperties.Gemini("gemini-2.0-flash"),
+                new LlmProperties.Groq("llama-3.3-70b-versatile"));
     }
 
     @Test
@@ -20,6 +21,7 @@ class LlmConfigTest {
         assertThatThrownBy(() -> new LlmConfig().chatModel(props("bogus")))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("anthropic")
-                .hasMessageContaining("gemini");
+                .hasMessageContaining("gemini")
+                .hasMessageContaining("groq");
     }
 }

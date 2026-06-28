@@ -25,7 +25,8 @@ class AlertEnrichmentSchedulerTest {
             true, "anthropic", Duration.ofSeconds(30),
             new LlmProperties.Enrichment(5, Duration.ofSeconds(10)),
             new LlmProperties.Anthropic("claude-haiku-4-5"),
-            new LlmProperties.Gemini("gemini-2.0-flash"));
+            new LlmProperties.Gemini("gemini-2.0-flash"),
+            new LlmProperties.Groq("llama-3.3-70b-versatile"));
     private final AlertEnrichmentScheduler scheduler =
             new AlertEnrichmentScheduler(repository, analystService, props);
 
