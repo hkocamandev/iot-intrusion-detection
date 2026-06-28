@@ -88,12 +88,15 @@ Unavailable`.
 | Key | Purpose |
 |-----|---------|
 | `app.llm.enabled` | Enable/disable all LLM features (default `false`) |
-| `app.llm.model` | LLM model identifier |
+| `app.llm.provider` | LLM provider: `gemini` (default) or `anthropic` |
+| `app.llm.gemini.model` | Gemini model id |
+| `app.llm.anthropic.model` | Anthropic model id |
 | `app.llm.timeout` | Per-call timeout |
 | `app.llm.enrichment.batch-size` | Alerts processed per scheduler tick |
 | `app.llm.enrichment.poll-interval` | Scheduler polling interval |
 
-**Runtime requirement:** set `ANTHROPIC_API_KEY` in the environment to use LLM features.
+**Runtime requirement:** set the matching API key for your chosen `app.llm.provider`
+(`GEMINI_API_KEY` for Gemini, `ANTHROPIC_API_KEY` for Anthropic) in the environment to use LLM features.
 The test suite runs with `app.llm.enabled=false` and requires no API key.
 
 ## Tech stack
