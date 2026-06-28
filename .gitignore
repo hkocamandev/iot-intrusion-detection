@@ -45,3 +45,7 @@ docs/notes/
 
 ### Dataset (Kaggle RT-IoT2022 — repoya konmaz) ###
 data/*.csv
+# screen recordings (use GitHub drag-drop attachment instead)
+*.mov
+*.mp4
+.DS_Store

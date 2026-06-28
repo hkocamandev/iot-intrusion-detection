@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="screenshots/banner.png" alt="IoT Network Intrusion Detection" width="100%">
+</p>
+
 # IoT Network Intrusion Detection
 
 A Kafka-based streaming system that performs near real-time intrusion detection on
