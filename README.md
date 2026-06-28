@@ -131,9 +131,9 @@ Runtime configuration is supplied through environment variables. The committed
    set -a; source .env; set +a
    ```
 
-**Never commit `.env` or a real key.** Gemini has a free tier (no credit card);
-`ANTHROPIC_API_KEY` is billed per token on the Anthropic Developer Platform,
-separate from any Claude Pro subscription.
+**Never commit `.env` or a real key.** Groq and Gemini both have free tiers (no credit
+card required); `ANTHROPIC_API_KEY` is billed per token on the Anthropic Developer
+Platform, separate from any Claude Pro subscription.
 
 ## Running locally
 
