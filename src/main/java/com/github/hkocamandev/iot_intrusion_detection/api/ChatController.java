@@ -32,7 +32,7 @@ public class ChatController {
         if (service == null) {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                     .body(new ChatResponse(
-                            "LLM chat is disabled. Set app.llm.enabled=true and ANTHROPIC_API_KEY."));
+                            "LLM chat is disabled. Set app.llm.enabled=true and the selected provider's API key."));
         }
         try {
             return ResponseEntity.ok(new ChatResponse(service.ask(request.question())));

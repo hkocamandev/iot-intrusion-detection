@@ -88,12 +88,15 @@ Unavailable`.
 | Key | Purpose |
 |-----|---------|
 | `app.llm.enabled` | Enable/disable all LLM features (default `false`) |
-| `app.llm.model` | LLM model identifier |
+| `app.llm.provider` | LLM provider: `gemini` (default) or `anthropic` |
+| `app.llm.gemini.model` | Gemini model id |
+| `app.llm.anthropic.model` | Anthropic model id |
 | `app.llm.timeout` | Per-call timeout |
 | `app.llm.enrichment.batch-size` | Alerts processed per scheduler tick |
 | `app.llm.enrichment.poll-interval` | Scheduler polling interval |
 
-**Runtime requirement:** set `ANTHROPIC_API_KEY` in the environment to use LLM features.
+**Runtime requirement:** set the matching API key for your chosen `app.llm.provider`
+(`GEMINI_API_KEY` for Gemini, `ANTHROPIC_API_KEY` for Anthropic) in the environment to use LLM features.
 The test suite runs with `app.llm.enabled=false` and requires no API key.
 
 ## Tech stack
@@ -115,9 +118,10 @@ Runtime configuration is supplied through environment variables. The committed
    ```
 
 2. Fill in the values. Everything has a working default that matches the bundled
-   `docker compose` stack, so the only one you normally need to set is
-   `ANTHROPIC_API_KEY` (required for the LLM features). To turn the LLM on, also set
-   `APP_LLM_ENABLED=true`.
+   `docker compose` stack. To use the LLM features, choose a provider with
+   `APP_LLM_PROVIDER` (`gemini` by default, or `anthropic`), set that provider's API
+   key (`GEMINI_API_KEY` — free at https://aistudio.google.com — or
+   `ANTHROPIC_API_KEY`), and set `APP_LLM_ENABLED=true`.
 
 3. Load `.env` into your shell before starting the app — Spring Boot does **not** read
    `.env` automatically:
@@ -126,8 +130,9 @@ Runtime configuration is supplied through environment variables. The committed
    set -a; source .env; set +a
    ```
 
-**Never commit `.env` or a real key.** `ANTHROPIC_API_KEY` is billed per token on the
-Anthropic Developer Platform, separate from any Claude Pro subscription.
+**Never commit `.env` or a real key.** Gemini has a free tier (no credit card);
+`ANTHROPIC_API_KEY` is billed per token on the Anthropic Developer Platform,
+separate from any Claude Pro subscription.
 
 ## Running locally
 

@@ -59,8 +59,12 @@ app:
       OTHER: LOW
   llm:
     enabled: false
-    model: claude-haiku-4-5
+    provider: gemini          # anthropic | gemini
     timeout: 30s
     enrichment:
       batch-size: 10
       poll-interval: 10s
+    anthropic:
+      model: claude-haiku-4-5
+    gemini:
+      model: gemini-2.0-flash
