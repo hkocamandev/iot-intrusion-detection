@@ -179,6 +179,9 @@ The test suite runs with `app.llm.enabled=false` and requires no API key.
 - Apache Kafka (Confluent, KRaft mode)
 - PostgreSQL 16 (JSONB feature storage)
 - Testcontainers for integration tests
+- LangChain4j
+- Machine Learning and LLM Support through Python and FastApi
+- Streaming and Security Hardening
 
 ## Configuration
 
@@ -227,7 +230,10 @@ To replay the dataset, see `data/README.md`, then set `app.simulator.enabled=tru
 Integration tests spin up real Kafka and PostgreSQL containers via Testcontainers,
 so Docker must be running.
 
-## Notes
+## DATA CREDIT
 
-Implementation and learning notes are maintained locally and are intentionally excluded
-from version control.
+https://www.kaggle.com/datasets/supplejade/rt-iot2022real-time-internet-of-things
+
+
+
+
