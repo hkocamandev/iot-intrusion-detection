@@ -14,10 +14,12 @@ class LlmPropertiesBindingTest {
             .withUserConfiguration(Config.class)
             .withPropertyValues(
                     "app.llm.enabled=true",
-                    "app.llm.model=claude-haiku-4-5",
+                    "app.llm.provider=gemini",
                     "app.llm.timeout=30s",
                     "app.llm.enrichment.batch-size=10",
-                    "app.llm.enrichment.poll-interval=10s");
+                    "app.llm.enrichment.poll-interval=10s",
+                    "app.llm.anthropic.model=claude-haiku-4-5",
+                    "app.llm.gemini.model=gemini-2.0-flash");
 
     @EnableConfigurationProperties(LlmProperties.class)
     static class Config { }
@@ -27,10 +29,12 @@ class LlmPropertiesBindingTest {
         runner.run(ctx -> {
             LlmProperties props = ctx.getBean(LlmProperties.class);
             assertThat(props.enabled()).isTrue();
-            assertThat(props.model()).isEqualTo("claude-haiku-4-5");
+            assertThat(props.provider()).isEqualTo("gemini");
             assertThat(props.timeout()).isEqualTo(Duration.ofSeconds(30));
             assertThat(props.enrichment().batchSize()).isEqualTo(10);
             assertThat(props.enrichment().pollInterval()).isEqualTo(Duration.ofSeconds(10));
+            assertThat(props.anthropic().model()).isEqualTo("claude-haiku-4-5");
+            assertThat(props.gemini().model()).isEqualTo("gemini-2.0-flash");
         });
     }
 }

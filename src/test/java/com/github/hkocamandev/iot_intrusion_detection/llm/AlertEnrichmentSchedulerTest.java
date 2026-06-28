@@ -22,8 +22,10 @@ class AlertEnrichmentSchedulerTest {
     private final AlertRepository repository = mock(AlertRepository.class);
     private final SecurityAnalystService analystService = mock(SecurityAnalystService.class);
     private final LlmProperties props = new LlmProperties(
-            true, "claude-haiku-4-5", Duration.ofSeconds(30),
-            new LlmProperties.Enrichment(5, Duration.ofSeconds(10)));
+            true, "anthropic", Duration.ofSeconds(30),
+            new LlmProperties.Enrichment(5, Duration.ofSeconds(10)),
+            new LlmProperties.Anthropic("claude-haiku-4-5"),
+            new LlmProperties.Gemini("gemini-2.0-flash"));
     private final AlertEnrichmentScheduler scheduler =
             new AlertEnrichmentScheduler(repository, analystService, props);
 
