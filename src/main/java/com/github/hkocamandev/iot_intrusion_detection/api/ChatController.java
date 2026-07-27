@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 /** Natural-language chat over alerts. Returns 503 when the LLM is disabled or unreachable. */
 @RestController
 @RequestMapping("/api/chat")
@@ -28,18 +30,22 @@ public class ChatController {
 
     @PostMapping
     public ResponseEntity<ChatResponse> chat(@RequestBody ChatRequest request) {
+        String sessionId = (request.sessionId() == null || request.sessionId().isBlank())
+                ? UUID.randomUUID().toString()
+                : request.sessionId();
         NlQueryService service = nlQueryService.getIfAvailable();
         if (service == null) {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                     .body(new ChatResponse(
-                            "LLM chat is disabled. Set app.llm.enabled=true and the selected provider's API key."));
+                            "LLM chat is disabled. Set app.llm.enabled=true and the selected provider's API key.",
+                            sessionId));
         }
         try {
-            return ResponseEntity.ok(new ChatResponse(service.ask(request.question())));
+            return ResponseEntity.ok(new ChatResponse(service.ask(sessionId, request.question()), sessionId));
         } catch (Exception e) {
             log.warn("LLM chat failed", e);
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                    .body(new ChatResponse("LLM chat temporarily unavailable."));
+                    .body(new ChatResponse("LLM chat temporarily unavailable.", sessionId));
         }
     }
 }

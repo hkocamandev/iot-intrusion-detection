@@ -14,7 +14,7 @@ public class NlQueryService {
         this.assistant = assistant;
     }
 
-    public String ask(String question) {
-        return assistant.chat(question);
+    public String ask(String sessionId, String question) {
+        return assistant.chat(sessionId, question);
     }
 }
