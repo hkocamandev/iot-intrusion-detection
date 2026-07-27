@@ -5,6 +5,7 @@ import com.github.hkocamandev.iot_intrusion_detection.llm.Assistant;
 import com.github.hkocamandev.iot_intrusion_detection.llm.SecurityAnalyst;
 import dev.langchain4j.model.anthropic.AnthropicChatModel;
 import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.service.AiServices;
@@ -56,6 +57,7 @@ public class LlmConfig {
         return AiServices.builder(Assistant.class)
                 .chatModel(chatModel)
                 .tools(alertQueryTools)
+                .chatMemoryProvider(sessionId -> MessageWindowChatMemory.withMaxMessages(20))
                 .build();
     }
 }
