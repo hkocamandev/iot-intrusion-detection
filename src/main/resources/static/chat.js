@@ -10,6 +10,13 @@
     'En çok saldırı alan kaynak',
   ];
 
+  function newSessionId() {
+    try {
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+    } catch (_) { /* non-secure context */ }
+    return 'sess-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+  }
+
   let state = loadState();
 
   function loadState() {
@@ -20,11 +27,13 @@
         if (parsed && parsed.sessionId && Array.isArray(parsed.messages)) return parsed;
       }
     } catch (_) { /* ignore corrupt storage */ }
-    return { sessionId: crypto.randomUUID(), messages: [] };
+    return { sessionId: newSessionId(), messages: [] };
   }
 
   function saveState() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (_) { /* ignore quota/serialization failures */ }
   }
 
   // Escape any value before it is interpolated into HTML. Chat content can echo
@@ -39,7 +48,7 @@
   // Assistant answers may echo attacker-controlled fields, so render markdown then
   // sanitize with DOMPurify before it ever reaches the DOM.
   function renderMarkdown(text) {
-    return DOMPurify.sanitize(marked.parse(String(text ?? '')));
+    return DOMPurify.sanitize(marked.parse(String(text ?? '')), { FORBID_TAGS: ['img'] });
   }
 
   function bubbleHtml(m) {
@@ -106,7 +115,7 @@
   }
 
   function newChat() {
-    state = { sessionId: crypto.randomUUID(), messages: [] };
+    state = { sessionId: newSessionId(), messages: [] };
     saveState();
     render();
   }
