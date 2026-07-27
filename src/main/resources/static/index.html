@@ -44,6 +44,12 @@
     .chat-send { background:#4f8cff; color:#fff; border:none; border-radius:8px;
       padding:0 1rem; cursor:pointer; }
     .chat-send:disabled, .chat-input:disabled { opacity:0.5; cursor:not-allowed; }
+    .msg.bot ul, .msg.bot ol { margin:0.3rem 0 0.3rem 1.1rem; }
+    .msg.bot code { background:#0f1419; padding:0 0.25rem; border-radius:4px; }
+    .msg.bot p { margin:0.3rem 0; }
+    .chat-chips { display:flex; flex-wrap:wrap; gap:0.4rem; padding:0 1rem 0.6rem; }
+    .chip { background:#1b2330; border:1px solid #2a3442; color:#cfe0f2;
+      border-radius:16px; padding:0.35rem 0.7rem; font-size:0.8rem; cursor:pointer; }
   </style>
 </head>
 <body>
@@ -76,6 +82,7 @@
     </header>
     <div id="chat-messages" class="chat-messages"></div>
     <div id="chat-typing" class="chat-typing" style="display:none">asistan yazıyor…</div>
+    <div id="chat-chips" class="chat-chips"></div>
     <div class="chat-input-row">
       <textarea id="chat-input" class="chat-input" rows="2" placeholder="Alert'ler hakkında sor…"></textarea>
       <button id="chat-send" class="chat-send">Gönder</button>
@@ -86,6 +93,8 @@
   <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
   <script src="/app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
   <script src="/chat.js"></script>
 </body>
 </html>

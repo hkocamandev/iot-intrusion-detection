@@ -4,6 +4,12 @@
 
   const STORAGE_KEY = 'iotChat';
 
+  const STARTERS = [
+    'Son 10 CRITICAL alert',
+    'ML vs RULE dağılımı',
+    'En çok saldırı alan kaynak',
+  ];
+
   let state = loadState();
 
   function loadState() {
@@ -30,6 +36,12 @@
     }[c]));
   }
 
+  // Assistant answers may echo attacker-controlled fields, so render markdown then
+  // sanitize with DOMPurify before it ever reaches the DOM.
+  function renderMarkdown(text) {
+    return DOMPurify.sanitize(marked.parse(String(text ?? '')));
+  }
+
   function bubbleHtml(m) {
     if (m.role === 'user') {
       return `<div class="msg user">${esc(m.content)}</div>`;
@@ -38,12 +50,14 @@
       return `<div class="msg error">${esc(m.content)}` +
         `<button class="retry" data-q="${esc(m.retry)}">tekrar dene</button></div>`;
     }
-    return `<div class="msg bot">${esc(m.content)}</div>`;
+    return `<div class="msg bot">${renderMarkdown(m.content)}</div>`;
   }
 
   function render() {
     const list = document.getElementById('chat-messages');
     list.innerHTML = state.messages.map(bubbleHtml).join('');
+    document.getElementById('chat-chips').style.display =
+      state.messages.length ? 'none' : 'flex';
     list.scrollTop = list.scrollHeight;
   }
 
@@ -121,6 +135,12 @@
 
     document.getElementById('chat-messages').addEventListener('click', (e) => {
       if (e.target.classList.contains('retry')) send(e.target.dataset.q);
+    });
+
+    const chips = document.getElementById('chat-chips');
+    chips.innerHTML = STARTERS.map((s) => `<button class="chip">${esc(s)}</button>`).join('');
+    chips.addEventListener('click', (e) => {
+      if (e.target.classList.contains('chip')) send(e.target.textContent);
     });
 
     render();
