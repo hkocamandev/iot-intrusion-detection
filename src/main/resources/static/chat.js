@@ -27,7 +27,7 @@
         if (parsed && parsed.sessionId && Array.isArray(parsed.messages)) return parsed;
       }
     } catch (_) { /* ignore corrupt storage */ }
-    return { sessionId: newSessionId(), messages: [] };
+    return { sessionId: newSessionId(), messages: [], provider: null, model: null };
   }
 
   function saveState() {
@@ -89,7 +89,7 @@
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: q, sessionId: session.sessionId }),
+        body: JSON.stringify({ question: q, sessionId: state.sessionId, provider: state.provider, model: state.model }),
       });
       let data;
       try {
@@ -98,6 +98,8 @@
         data = {};
       }
       if (data.sessionId) session.sessionId = data.sessionId;
+      if (data.provider) session.provider = data.provider;
+      if (data.model) session.model = data.model;
       if (res.ok) {
         session.messages.push({ role: 'bot', content: data.answer });
       } else {
@@ -115,9 +117,48 @@
   }
 
   function newChat() {
-    state = { sessionId: newSessionId(), messages: [] };
+    state = { sessionId: newSessionId(), messages: [], provider: state.provider, model: state.model };
     saveState();
     render();
+  }
+
+  let options = { providers: [], defaultProvider: null, defaultModel: null };
+
+  function modelsFor(providerId) {
+    const p = options.providers.find((x) => x.id === providerId);
+    return p ? p.models : [];
+  }
+
+  function fillModelSelect() {
+    const models = modelsFor(state.provider);
+    document.getElementById('chat-model').innerHTML =
+      models.map((m) => `<option value="${esc(m)}">${esc(m)}</option>`).join('');
+    if (!models.includes(state.model)) state.model = models[0] || null;
+    document.getElementById('chat-model').value = state.model || '';
+  }
+
+  function renderSelectors() {
+    const row = document.getElementById('chat-selectors');
+    if (!options.providers.length) { row.hidden = true; return; }
+    row.hidden = false;
+    const provSel = document.getElementById('chat-provider');
+    provSel.innerHTML = options.providers
+      .map((p) => `<option value="${esc(p.id)}">${esc(p.id)}</option>`).join('');
+    // Adopt a valid default if the saved provider is no longer offered.
+    if (!options.providers.some((p) => p.id === state.provider)) {
+      state.provider = options.defaultProvider;
+      state.model = options.defaultModel;
+    }
+    provSel.value = state.provider || '';
+    fillModelSelect();
+    saveState();
+  }
+
+  async function loadOptions() {
+    try {
+      options = await (await fetch('/api/llm/options')).json();
+    } catch (_) { options = { providers: [], defaultProvider: null, defaultModel: null }; }
+    renderSelectors();
   }
 
   function sendFromInput() {
@@ -151,6 +192,17 @@
     chips.addEventListener('click', (e) => {
       if (e.target.classList.contains('chip')) send(e.target.textContent);
     });
+
+    document.getElementById('chat-provider').addEventListener('change', (e) => {
+      state.provider = e.target.value;
+      fillModelSelect();
+      saveState();
+    });
+    document.getElementById('chat-model').addEventListener('change', (e) => {
+      state.model = e.target.value;
+      saveState();
+    });
+    loadOptions();
 
     render();
   }

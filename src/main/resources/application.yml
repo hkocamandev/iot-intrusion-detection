@@ -66,7 +66,14 @@ app:
       poll-interval: 10s
     anthropic:
       model: claude-haiku-4-5
+      models:
+        - claude-haiku-4-5
     gemini:
       model: gemini-2.0-flash
+      models:
+        - gemini-2.0-flash
     groq:
       model: llama-3.3-70b-versatile
+      models:
+        - llama-3.3-70b-versatile
+        - openai/gpt-oss-120b

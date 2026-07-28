@@ -38,14 +38,17 @@ public class ChatController {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                     .body(new ChatResponse(
                             "LLM chat is disabled. Set app.llm.enabled=true and the selected provider's API key.",
-                            sessionId));
+                            sessionId, null, null));
         }
         try {
-            return ResponseEntity.ok(new ChatResponse(service.ask(sessionId, request.question()), sessionId));
+            var answer = service.ask(sessionId, request.question(), request.provider(), request.model());
+            return ResponseEntity.ok(
+                    new ChatResponse(answer.answer(), sessionId, answer.provider(), answer.model()));
         } catch (Exception e) {
             log.warn("LLM chat failed", e);
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                    .body(new ChatResponse("LLM chat temporarily unavailable.", sessionId));
+                    .body(new ChatResponse("LLM chat temporarily unavailable.",
+                            sessionId, request.provider(), request.model()));
         }
     }
 }
