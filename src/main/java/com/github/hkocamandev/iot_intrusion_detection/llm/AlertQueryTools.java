@@ -44,6 +44,20 @@ public class AlertQueryTools {
         return toMap(repository.countByDetectionSource());
     }
 
+    @Tool("""
+            Returns alert counts grouped by BOTH severity and detection source, as a nested map
+            severity -> {source -> count} (source is RULE or ML). Use this for questions that combine
+            the two, e.g. "how many CRITICAL alerts were detected by ML".""")
+    public Map<String, Map<String, Long>> countBySeverityAndDetectionSource() {
+        Map<String, Map<String, Long>> result = new LinkedHashMap<>();
+        for (Object[] row : repository.countBySeverityAndDetectionSource()) {
+            String severity = String.valueOf(row[0]);
+            String source = String.valueOf(row[1]);
+            result.computeIfAbsent(severity, k -> new LinkedHashMap<>()).put(source, (Long) row[2]);
+        }
+        return result;
+    }
+
     private static Map<String, Long> toMap(List<Object[]> rows) {
         Map<String, Long> result = new LinkedHashMap<>();
         for (Object[] row : rows) {

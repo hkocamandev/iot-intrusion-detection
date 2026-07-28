@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -27,6 +28,20 @@ class AlertQueryToolsTest {
         assertThat(tools.countByAttackType())
                 .containsEntry("DOS", 2L)
                 .containsEntry("RECON", 1L);
+    }
+
+    @Test
+    void countBySeverityAndDetectionSourceBuildsNestedMap() {
+        when(repository.countBySeverityAndDetectionSource()).thenReturn(List.of(
+                new Object[]{Severity.CRITICAL, DetectionSource.ML, 18L},
+                new Object[]{Severity.CRITICAL, DetectionSource.RULE, 18L},
+                new Object[]{Severity.HIGH, DetectionSource.ML, 10L}));
+
+        Map<String, Map<String, Long>> result = tools.countBySeverityAndDetectionSource();
+
+        assertThat(result).containsOnlyKeys("CRITICAL", "HIGH");
+        assertThat(result.get("CRITICAL")).containsEntry("ML", 18L).containsEntry("RULE", 18L);
+        assertThat(result.get("HIGH")).containsEntry("ML", 10L);
     }
 
     @Test

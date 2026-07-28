@@ -67,4 +67,23 @@ class AlertStatsRepositoryTest {
         assertThat(toMap(repository.countByDetectionSource()))
                 .containsEntry("RULE", 2L).containsEntry("ML", 1L);
     }
+
+    @Test
+    void countsBySeverityAndDetectionSource() {
+        Instant base = Instant.parse("2026-06-20T10:00:00Z");
+        repository.save(alert(base, AttackType.DOS, Severity.CRITICAL, DetectionSource.ML));
+        repository.save(alert(base, AttackType.RECON, Severity.CRITICAL, DetectionSource.ML));
+        repository.save(alert(base, AttackType.DOS, Severity.CRITICAL, DetectionSource.RULE));
+        repository.save(alert(base, AttackType.DOS, Severity.HIGH, DetectionSource.ML));
+
+        Map<String, Long> m = new HashMap<>();
+        for (Object[] r : repository.countBySeverityAndDetectionSource()) {
+            m.put(((Enum<?>) r[0]).name() + "/" + ((Enum<?>) r[1]).name(), ((Number) r[2]).longValue());
+        }
+
+        assertThat(m)
+                .containsEntry("CRITICAL/ML", 2L)
+                .containsEntry("CRITICAL/RULE", 1L)
+                .containsEntry("HIGH/ML", 1L);
+    }
 }
