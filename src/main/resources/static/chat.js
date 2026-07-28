@@ -117,7 +117,7 @@
   }
 
   function newChat() {
-    state = { sessionId: newSessionId(), messages: [] };
+    state = { sessionId: newSessionId(), messages: [], provider: state.provider, model: state.model };
     saveState();
     render();
   }
