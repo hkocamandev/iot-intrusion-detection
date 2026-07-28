@@ -79,11 +79,21 @@ tier needs no credit card. See [Configuration](#configuration).
 
 The dashboard also ships an in-page **chat drawer** for the same assistant, so you can ask
 without leaving the alerts view. It is **multi-turn** (the assistant remembers earlier turns in
-the session — e.g. ask for a breakdown, then "how many of those are ML-detected?"), renders
-answers as **sanitized markdown**, offers clickable **starter prompts**, and persists the
-conversation across page reloads.
+the session), renders answers as **sanitized markdown**, offers clickable **starter prompts**,
+and persists the conversation across page reloads.
+
+A **provider/model selector** in the drawer header lets you switch the LLM at runtime. Only
+providers whose API key is present in the environment are offered, each with a curated model
+list (for the free Groq tier: `llama-3.3-70b-versatile` and `openai/gpt-oss-120b`). Because
+conversation memory is keyed by session and shared across models, you can **switch model
+mid-conversation** and the new model still sees the earlier turns.
 
 ![Chat drawer](screenshots/chat.png)
+
+Above: after listing alert counts by attack type on one model, the user switches the model
+dropdown to `gpt-oss-120b` and asks a combined question — *"how many of the CRITICAL alerts
+were detected by ML?"* — which the assistant answers by cross-filtering severity and detection
+source.
 
 ## Architecture (Phase 1 — ingest & store)
 
@@ -164,15 +174,22 @@ questions such as "how many HIGH alerts in the last hour?" by invoking the right
 returning a plain-language answer. When LLM is disabled the endpoint returns `503 Service
 Unavailable`.
 
+**Runtime model selection:** `GET /api/llm/options` reports the providers that have an API key
+present and their curated model lists; `POST /api/chat` accepts an optional `provider`/`model`
+and echoes the pair that actually answered. A registry caches one assistant per
+`(provider, model)`, all sharing a single session-keyed chat-memory store, so switching model
+mid-conversation preserves history. Enrichment always uses the configured default provider/model.
+
 **Configuration (`application.yml`):**
 
 | Key | Purpose |
 |-----|---------|
 | `app.llm.enabled` | Enable/disable all LLM features (default `false`) |
-| `app.llm.provider` | LLM provider: `groq` (default), `gemini`, or `anthropic` |
-| `app.llm.groq.model` | Groq model id |
-| `app.llm.gemini.model` | Gemini model id |
-| `app.llm.anthropic.model` | Anthropic model id |
+| `app.llm.provider` | Default LLM provider: `groq` (default), `gemini`, or `anthropic` |
+| `app.llm.groq.model` | Default Groq model id |
+| `app.llm.groq.models` | Groq models offered in the chat selector |
+| `app.llm.gemini.model` / `.models` | Gemini default model + selectable list |
+| `app.llm.anthropic.model` / `.models` | Anthropic default model + selectable list |
 | `app.llm.timeout` | Per-call timeout |
 | `app.llm.enrichment.batch-size` | Alerts processed per scheduler tick |
 | `app.llm.enrichment.poll-interval` | Scheduler polling interval |
