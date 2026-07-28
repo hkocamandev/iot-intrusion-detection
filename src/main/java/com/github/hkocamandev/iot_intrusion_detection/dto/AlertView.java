@@ -7,8 +7,8 @@ import com.github.hkocamandev.iot_intrusion_detection.model.Severity;
 
 import java.time.Instant;
 
-/** REST + WebSocket için okunur alarm görünümü. Alert entity'sinden (id dolu) veya
- *  AlertEvent'ten (id=null, createdAt=detectedAt) kurulabilir. */
+/** Read-only alert view for REST + WebSocket. Buildable from an Alert entity (id set) or
+ *  from an AlertEvent (id=null, createdAt=detectedAt). */
 public record AlertView(
         Long id,
         Instant createdAt,

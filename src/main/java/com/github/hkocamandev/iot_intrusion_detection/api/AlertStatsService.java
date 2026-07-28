@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** alerts tablosundan aggregate sayıları toplayıp StatsResponse kurar. */
+/** Aggregates counts from the alerts table into a StatsResponse. */
 @Service
 public class AlertStatsService {
 

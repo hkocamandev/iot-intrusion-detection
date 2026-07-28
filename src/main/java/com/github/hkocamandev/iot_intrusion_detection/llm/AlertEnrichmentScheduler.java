@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.List;
 
-/** Periodically enriches unenriched alerts in bounded batches. app.llm.enabled=true ise aktif. */
+/** Periodically enriches unenriched alerts in bounded batches. Active when app.llm.enabled=true. */
 @Component
 @ConditionalOnProperty(name = "app.llm.enabled", havingValue = "true")
 public class AlertEnrichmentScheduler {

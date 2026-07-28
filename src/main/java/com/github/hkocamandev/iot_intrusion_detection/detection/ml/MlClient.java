@@ -11,7 +11,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 
-/** ml-service'e REST çağrısı. Hata/timeout durumunda boş döner (fallback), asla exception fırlatmaz. */
+/** REST call to ml-service. Returns empty on error/timeout (fallback), never throws. */
 @Component
 public class MlClient {
 

@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-/** iot.traffic.raw (grup ml-engine) -> ML servisi -> ML alarmı. app.ml.enabled=true ise aktif. */
+/** iot.traffic.raw (group ml-engine) -> ML service -> ML alert. Active when app.ml.enabled=true. */
 @Component
 @ConditionalOnProperty(name = "app.ml.enabled", havingValue = "true")
 public class MlBasedConsumer {

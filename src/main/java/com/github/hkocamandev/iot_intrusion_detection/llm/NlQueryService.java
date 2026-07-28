@@ -3,7 +3,7 @@ package com.github.hkocamandev.iot_intrusion_detection.llm;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-/** Answers natural-language questions about alerts. app.llm.enabled=true ise aktif. */
+/** Answers natural-language questions about alerts. Active when app.llm.enabled=true. */
 @Service
 @ConditionalOnProperty(name = "app.llm.enabled", havingValue = "true")
 public class NlQueryService {

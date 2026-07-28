@@ -5,9 +5,9 @@
   const STORAGE_KEY = 'iotChat';
 
   const STARTERS = [
-    'Son 10 CRITICAL alert',
-    'ML vs RULE dağılımı',
-    'En çok saldırı alan kaynak',
+    'Last 10 CRITICAL alerts',
+    'ML vs RULE breakdown',
+    'Most-targeted source',
   ];
 
   function newSessionId() {
@@ -57,7 +57,7 @@
     }
     if (m.role === 'error') {
       return `<div class="msg error">${esc(m.content)}` +
-        `<button class="retry" data-q="${esc(m.retry)}">tekrar dene</button></div>`;
+        `<button class="retry" data-q="${esc(m.retry)}">retry</button></div>`;
     }
     return `<div class="msg bot">${renderMarkdown(m.content)}</div>`;
   }
@@ -101,10 +101,10 @@
       if (res.ok) {
         session.messages.push({ role: 'bot', content: data.answer });
       } else {
-        session.messages.push({ role: 'error', content: data.answer || 'LLM chat kullanılamıyor.', retry: q });
+        session.messages.push({ role: 'error', content: data.answer || 'LLM chat unavailable.', retry: q });
       }
     } catch (_) {
-      session.messages.push({ role: 'error', content: 'Ağ hatası, tekrar dene.', retry: q });
+      session.messages.push({ role: 'error', content: 'Network error, please retry.', retry: q });
     } finally {
       setBusy(false);
       if (state === session) {

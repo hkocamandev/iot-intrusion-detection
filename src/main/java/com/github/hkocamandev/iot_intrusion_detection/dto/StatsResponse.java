@@ -2,7 +2,7 @@ package com.github.hkocamandev.iot_intrusion_detection.dto;
 
 import java.util.Map;
 
-/** /api/stats yanıtı: toplam + tip/severity/kaynak sayıları (enum adı -> sayı). */
+/** /api/stats response: total + counts by type/severity/source (enum name -> count). */
 public record StatsResponse(
         long total,
         Map<String, Long> byAttackType,

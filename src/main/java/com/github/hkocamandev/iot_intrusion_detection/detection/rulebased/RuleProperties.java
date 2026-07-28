@@ -6,11 +6,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.List;
 
-/** app.rules altındaki eşik kurallarının config bağlaması. */
+/** Config binding for the threshold rules under app.rules. */
 @ConfigurationProperties(prefix = "app")
 public record RuleProperties(List<ThresholdRule> rules) {
 
-    /** Tek bir eşik kuralı: belirtilen feature değeri threshold'u aşarsa alarm üretir. */
+    /** A single threshold rule: raises an alert when the given feature value exceeds the threshold. */
     public record ThresholdRule(
             String name,
             String feature,

@@ -11,7 +11,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 
-/** ML tahminini AlertEvent'e çevirir: NORMAL veya düşük güven -> alarm yok. */
+/** Converts an ML prediction into an AlertEvent: NORMAL or low confidence -> no alert. */
 @Component
 public class MlAlertMapper {
 

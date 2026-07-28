@@ -18,7 +18,7 @@ public class RuleEngine {
         this.properties = properties;
     }
 
-    /** Eşik aşan her kural için bir AlertEvent üretir (bir akış birden çok kuralı tetikleyebilir). */
+    /** Produces an AlertEvent for each rule whose threshold is exceeded (a flow may trigger multiple rules). */
     public List<AlertEvent> evaluate(TrafficEvent event) {
         List<AlertEvent> alerts = new ArrayList<>();
         if (properties.rules() == null) return alerts;

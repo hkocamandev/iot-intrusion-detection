@@ -22,14 +22,14 @@ public class NetworkFlow {
     private String protocol;
     private String service;
 
-    /** RT-IoT2022 ham etiketi (ör. "DOS_SYN_Hping"). */
+    /** Raw RT-IoT2022 label (e.g. "DOS_SYN_Hping"). */
     private String trueLabel;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AttackType trueAttackType;
 
-    /** Tüm sayısal özellikler; ML aşamasında kullanılacak. */
+    /** All numeric features; used in the ML phase. */
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private Map<String, Double> features;
