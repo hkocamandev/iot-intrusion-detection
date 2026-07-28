@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/** Son alarmları döner (en yeni önce, son 100), opsiyonel severity filtresiyle. */
+/** Returns recent alerts (newest first, up to 100), with an optional severity filter. */
 @RestController
 @RequestMapping("/api/alerts")
 public class AlertController {

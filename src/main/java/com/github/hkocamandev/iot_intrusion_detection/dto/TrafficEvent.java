@@ -3,7 +3,7 @@ package com.github.hkocamandev.iot_intrusion_detection.dto;
 import java.time.Instant;
 import java.util.Map;
 
-/** Kafka iot.traffic.raw mesajı. JSON serileştirme spring-kafka JsonSerializer ile. */
+/** Kafka iot.traffic.raw message. JSON serialization via spring-kafka JsonSerializer. */
 public record TrafficEvent(
         Instant ingestedAt,
         String sourceId,

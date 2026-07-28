@@ -1,7 +1,7 @@
 package com.github.hkocamandev.iot_intrusion_detection.model;
 
-/** RT-IoT2022 etiketleri ham string olarak da saklanır; bu enum bilinen
- *  kategorileri tiplemek için. NORMAL = saldırı yok. */
+/** RT-IoT2022 labels are also stored as raw strings; this enum types the known
+ *  categories. NORMAL = no attack. */
 public enum AttackType {
     NORMAL, DOS, DDOS, PORT_SCAN, BRUTE_FORCE, RECON, OTHER;
 

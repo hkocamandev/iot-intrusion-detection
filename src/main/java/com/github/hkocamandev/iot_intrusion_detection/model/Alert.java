@@ -34,7 +34,7 @@ public class Alert {
     private String service;
     private String trueLabel;
 
-    // Plan 5 (LLM) tarafından doldurulacak — şimdilik null
+    // Populated by Plan 5 (LLM) — null for now
     @Column(length = 2000)
     private String llmExplanation;
     @Column(length = 2000)

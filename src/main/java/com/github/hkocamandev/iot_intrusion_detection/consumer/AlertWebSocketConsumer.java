@@ -8,7 +8,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-/** iot.alerts (grup dashboard) -> STOMP /topic/alerts. Push hatası yutulur (kritik değil). */
+/** iot.alerts (group dashboard) -> STOMP /topic/alerts. Push errors are swallowed (non-critical). */
 @Component
 public class AlertWebSocketConsumer {
 

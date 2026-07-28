@@ -6,7 +6,7 @@ import com.github.hkocamandev.iot_intrusion_detection.model.Severity;
 
 import java.time.Instant;
 
-/** Kafka iot.alerts mesajı. Bir kuralın (veya ileride ML'in) ürettiği alarm. */
+/** Kafka iot.alerts message. An alert produced by a rule (or, later, by ML). */
 public record AlertEvent(
         Instant detectedAt,
         String sourceId,

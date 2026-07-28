@@ -44,7 +44,7 @@ public class CsvReplaySimulator {
             }
             log.info("Replayed {} flows from {}", count, csvPath);
         } catch (IOException e) {
-            throw new IllegalStateException("CSV okunamadı: " + csvPath, e);
+            throw new IllegalStateException("Failed to read CSV: " + csvPath, e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.warn("Replay interrupted after {} flows from {}", count, csvPath);
