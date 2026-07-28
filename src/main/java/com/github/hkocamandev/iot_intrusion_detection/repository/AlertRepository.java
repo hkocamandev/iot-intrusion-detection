@@ -24,4 +24,7 @@ public interface AlertRepository extends JpaRepository<Alert, Long> {
 
     @Query("select a.detectionSource, count(a) from Alert a group by a.detectionSource")
     List<Object[]> countByDetectionSource();
+
+    @Query("select a.severity, a.detectionSource, count(a) from Alert a group by a.severity, a.detectionSource")
+    List<Object[]> countBySeverityAndDetectionSource();
 }
