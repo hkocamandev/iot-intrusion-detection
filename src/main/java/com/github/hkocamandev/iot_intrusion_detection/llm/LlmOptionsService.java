@@ -3,6 +3,7 @@ package com.github.hkocamandev.iot_intrusion_detection.llm;
 import com.github.hkocamandev.iot_intrusion_detection.config.LlmProperties;
 import com.github.hkocamandev.iot_intrusion_detection.dto.LlmOptions;
 import com.github.hkocamandev.iot_intrusion_detection.dto.ProviderOption;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ public class LlmOptionsService {
     private final LlmProperties properties;
     private final Predicate<String> keyPresent;
 
+    @Autowired
     public LlmOptionsService(LlmProperties properties) {
         this(properties, envVar -> {
             String v = System.getenv(envVar);
