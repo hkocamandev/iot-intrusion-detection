@@ -57,6 +57,8 @@ class ChatControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
         assertThat(response.getBody().answer()).contains("disabled");
         assertThat(response.getBody().sessionId()).isEqualTo("sess-abc");
+        assertThat(response.getBody().provider()).isNull();
+        assertThat(response.getBody().model()).isNull();
     }
 
     @Test

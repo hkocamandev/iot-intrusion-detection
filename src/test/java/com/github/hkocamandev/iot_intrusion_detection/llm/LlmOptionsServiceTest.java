@@ -45,6 +45,13 @@ class LlmOptionsServiceTest {
     }
 
     @Test
+    void resolveIsCaseInsensitiveOnProvider() {
+        ResolvedModel r = service.resolve("GROQ", "openai/gpt-oss-120b");
+        assertThat(r.provider()).isEqualTo("groq");
+        assertThat(r.model()).isEqualTo("openai/gpt-oss-120b");
+    }
+
+    @Test
     void resolveFallsBackToDefaultForUnavailableProviderOrModel() {
         assertThat(service.resolve("gemini", "gemini-2.0-flash"))
                 .isEqualTo(new ResolvedModel("groq", "llama-3.3-70b-versatile"));
