@@ -69,6 +69,7 @@ app:
     gemini:
       model: gemini-2.0-flash
     groq:
-      # 70b-versatile has a higher free-tier tokens-per-minute limit (12k) than
-      # 8b-instant (6k), which matters most for token-heavy tool-calling chat.
-      model: llama-3.3-70b-versatile
+      # gpt-oss-120b: strong tool-calling with a larger daily free-tier budget
+      # (TPD 200k vs 100k on 70b-versatile). Verify availability with
+      # GET /openai/v1/models — model ids differ per account.
+      model: openai/gpt-oss-120b
