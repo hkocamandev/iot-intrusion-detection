@@ -6,6 +6,8 @@ import com.github.hkocamandev.iot_intrusion_detection.llm.SecurityAnalyst;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.service.AiServices;
+import dev.langchain4j.store.memory.chat.ChatMemoryStore;
+import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +19,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ConditionalOnProperty(name = "app.llm.enabled", havingValue = "true")
 @EnableScheduling
 public class LlmConfig {
+
+    @Bean
+    public ChatMemoryStore chatMemoryStore() {
+        return new InMemoryChatMemoryStore();
+    }
 
     @Bean
     public ChatModel chatModel(ChatModelFactory factory, LlmProperties properties) {
