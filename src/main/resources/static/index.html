@@ -51,6 +51,10 @@
     .chat-chips { display:flex; flex-wrap:wrap; gap:0.4rem; padding:0 1rem 0.6rem; }
     .chip { background:#1b2330; border:1px solid #2a3442; color:#cfe0f2;
       border-radius:16px; padding:0.35rem 0.7rem; font-size:0.8rem; cursor:pointer; }
+    .chat-selectors { display:flex; gap:0.4rem; padding:0.4rem 1rem; border-bottom:1px solid #2a3442; }
+    .chat-selectors select { flex:1; background:#0f1419; color:#e6e6e6; border:1px solid #2a3442;
+      border-radius:6px; padding:0.3rem; font-size:0.8rem; }
+    .chat-selectors[hidden] { display:none; }
   </style>
 </head>
 <body>
@@ -81,6 +85,10 @@
         <button id="chat-close" class="chat-btn" title="Close">✕</button>
       </span>
     </header>
+    <div id="chat-selectors" class="chat-selectors" hidden>
+      <select id="chat-provider" aria-label="Provider"></select>
+      <select id="chat-model" aria-label="Model"></select>
+    </div>
     <div id="chat-messages" class="chat-messages"></div>
     <div id="chat-typing" class="chat-typing" style="display:none">assistant is typing…</div>
     <div id="chat-chips" class="chat-chips"></div>
