@@ -77,6 +77,14 @@ curl -s -X POST localhost:8080/api/chat -H "Content-Type: application/json" \
 The provider is configurable (`app.llm.provider = groq | gemini | anthropic`); Groq's free
 tier needs no credit card. See [Configuration](#configuration).
 
+The dashboard also ships an in-page **chat drawer** for the same assistant, so you can ask
+without leaving the alerts view. It is **multi-turn** (the assistant remembers earlier turns in
+the session — e.g. ask for a breakdown, then "how many of those are ML-detected?"), renders
+answers as **sanitized markdown**, offers clickable **starter prompts**, and persists the
+conversation across page reloads.
+
+![Chat drawer](screenshots/chat.png)
+
 ## Architecture (Phase 1 — ingest & store)
 
 ```
