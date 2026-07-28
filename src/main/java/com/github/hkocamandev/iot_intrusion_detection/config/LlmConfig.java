@@ -40,6 +40,10 @@ public class LlmConfig {
                     .apiKey(System.getenv("GROQ_API_KEY"))
                     .modelName(properties.groq().model())
                     .timeout(properties.timeout())
+                    // Fail fast on rate-limits: a per-minute/day token limit won't clear
+                    // within the retry window, so auto-retrying only adds latency before
+                    // the inevitable 503. Let the UI's "retry" drive a later attempt.
+                    .maxRetries(1)
                     .build();
             default -> throw new IllegalArgumentException(
                     "Unknown app.llm.provider '" + provider
@@ -57,7 +61,9 @@ public class LlmConfig {
         return AiServices.builder(Assistant.class)
                 .chatModel(chatModel)
                 .tools(alertQueryTools)
-                .chatMemoryProvider(sessionId -> MessageWindowChatMemory.withMaxMessages(20))
+                // Keep the window small: each turn re-sends the whole history + tool
+                // schemas, so a large window quickly exhausts free-tier token limits.
+                .chatMemoryProvider(sessionId -> MessageWindowChatMemory.withMaxMessages(6))
                 .build();
     }
 }
