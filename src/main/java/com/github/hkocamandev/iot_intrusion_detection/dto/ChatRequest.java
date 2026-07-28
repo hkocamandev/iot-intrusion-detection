@@ -1,4 +1,4 @@
 package com.github.hkocamandev.iot_intrusion_detection.dto;
 
-/** NL chat request body. sessionId is optional; blank/absent means "start a new session". */
-public record ChatRequest(String question, String sessionId) { }
+/** NL chat request. sessionId/provider/model are optional; blank means "use the default". */
+public record ChatRequest(String question, String sessionId, String provider, String model) { }

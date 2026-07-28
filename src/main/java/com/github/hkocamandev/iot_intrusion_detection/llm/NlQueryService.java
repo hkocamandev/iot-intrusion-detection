@@ -8,13 +8,18 @@ import org.springframework.stereotype.Service;
 @ConditionalOnProperty(name = "app.llm.enabled", havingValue = "true")
 public class NlQueryService {
 
-    private final Assistant assistant;
+    private final AssistantRegistry registry;
+    private final LlmOptionsService options;
 
-    public NlQueryService(Assistant assistant) {
-        this.assistant = assistant;
+    public NlQueryService(AssistantRegistry registry, LlmOptionsService options) {
+        this.registry = registry;
+        this.options = options;
     }
 
-    public String ask(String sessionId, String question) {
-        return assistant.chat(sessionId, question);
+    /** Resolves the requested provider/model (falling back to the default) and answers. */
+    public ChatAnswer ask(String sessionId, String question, String provider, String model) {
+        ResolvedModel resolved = options.resolve(provider, model);
+        String answer = registry.get(resolved.provider(), resolved.model()).chat(sessionId, question);
+        return new ChatAnswer(answer, resolved.provider(), resolved.model());
     }
 }

@@ -1,4 +1,4 @@
 package com.github.hkocamandev.iot_intrusion_detection.dto;
 
-/** NL chat response body. sessionId is the (possibly server-generated) conversation id. */
-public record ChatResponse(String answer, String sessionId) { }
+/** NL chat response. provider/model report which model actually answered. */
+public record ChatResponse(String answer, String sessionId, String provider, String model) { }
