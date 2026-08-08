@@ -5,6 +5,7 @@ import com.github.hkocamandev.iot_intrusion_detection.repository.AlertRepository
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -18,6 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AlertController.class)
+@WithMockUser(roles = "ANALYST")
 class AlertControllerTest {
 
     @Autowired MockMvc mockMvc;
@@ -48,5 +50,13 @@ class AlertControllerTest {
                 .andExpect(status().isOk());
 
         verify(repository).findTop100BySeverityOrderByCreatedAtDesc(Severity.HIGH);
+    }
+
+    @Test
+    @WithMockUser(roles = "ANALYST")
+    void isReachableByAnalyst() throws Exception {
+        when(repository.findTop100ByOrderByCreatedAtDesc()).thenReturn(List.of(alert()));
+
+        mockMvc.perform(get("/api/alerts")).andExpect(status().isOk());
     }
 }

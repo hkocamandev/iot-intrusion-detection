@@ -27,6 +27,12 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 app:
+  security:
+    jwt:
+      # No default. HS256 needs >= 256 bits; generate with: openssl rand -base64 48
+      secret: ${JWT_SECRET:}
+      ttl: 1h
+      issuer: iot-intrusion-detection
   topics:
     traffic-raw: iot.traffic.raw
     alerts: iot.alerts
