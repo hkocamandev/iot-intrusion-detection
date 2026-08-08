@@ -33,6 +33,11 @@ app:
       secret: ${JWT_SECRET:}
       ttl: 1h
       issuer: iot-intrusion-detection
+    seed:
+      # The initial ADMIN account, created only when no accounts exist yet.
+      # Registration can only create ANALYSTs, so without this there is no admin.
+      admin-username: ${SEED_ADMIN_USERNAME:admin}
+      admin-password: ${SEED_ADMIN_PASSWORD:}
   topics:
     traffic-raw: iot.traffic.raw
     alerts: iot.alerts
