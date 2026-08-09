@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
+import java.util.stream.Stream;
 
 /** Registration, login and session introspection. */
 @RestController
@@ -98,13 +99,29 @@ public class AuthController {
         return new UserInfo(authentication.getName(), roleOf(authentication));
     }
 
+    /**
+     * Defensive: {@code /api/auth/me} is {@code authenticated()} in {@code SecurityConfig}, so
+     * a null or anonymous {@code Authentication} should never reach here (pinned by
+     * {@code SecurityAuthorizationIT.anonymousMeIsRejectedBeforeReachingTheController}). The
+     * guard exists so correctness does not depend on that reachability: any authentication this
+     * method cannot map to a known {@link Role} becomes a clean 401 instead of a 500.
+     */
     private static Role roleOf(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new InvalidCredentialsException();
+        }
         return authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(a -> a.startsWith(ROLE_PREFIX))
-                .map(a -> Role.valueOf(a.substring(ROLE_PREFIX.length())))
+                .flatMap(a -> {
+                    try {
+                        return Stream.of(Role.valueOf(a.substring(ROLE_PREFIX.length())));
+                    } catch (IllegalArgumentException e) {
+                        return Stream.empty();
+                    }
+                })
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Authenticated user has no role authority"));
+                .orElseThrow(InvalidCredentialsException::new);
     }
 
     /** Registration conflict — 409. */

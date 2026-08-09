@@ -75,8 +75,14 @@ public class SecurityConfig {
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login")
                         .permitAll()
-                        // LLM calls cost money and quota, so they are ADMIN-only.
-                        .requestMatchers("/api/chat", "/api/llm/**").hasRole("ADMIN")
+                        // LLM calls cost money and quota, so they are ADMIN-only. Both the exact
+                        // path and its "/**" subtree are listed for /api/chat (unlike /api/llm,
+                        // which only ever needs the subtree) because a future @PostMapping under
+                        // ChatController must not fall through to .anyRequest().authenticated().
+                        // PathPattern treats a trailing "/**" as matching zero segments but
+                        // AntPathMatcher does not, so this must not depend on which matcher
+                        // Spring Security happens to pick.
+                        .requestMatchers("/api/chat", "/api/chat/**", "/api/llm/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(entryPoint)

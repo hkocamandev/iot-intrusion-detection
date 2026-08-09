@@ -13,8 +13,9 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 
 /**
- * Creates the initial ADMIN account, which registration cannot produce. Runs only when the
- * table is empty, so it never resets an existing password.
+ * Creates the initial ADMIN account, which registration cannot produce. Runs only when no
+ * ADMIN account exists yet, so it never resets an existing password — and, unlike a guard on
+ * "any account exists", it still seeds an ADMIN even after other roles have self-registered.
  */
 @Component
 public class UserSeeder implements ApplicationRunner {
@@ -39,11 +40,18 @@ public class UserSeeder implements ApplicationRunner {
             log.info("Admin seeding skipped: app.security.seed.admin-password is not set");
             return;
         }
-        if (users.count() > 0) {
-            log.info("Admin seeding skipped: accounts already exist");
+        if (users.existsByRole(Role.ADMIN)) {
+            log.info("Admin seeding skipped: an ADMIN account already exists");
             return;
         }
         String username = properties.adminUsername();
+        if (users.existsByUsername(username)) {
+            log.error("Admin seeding failed: configured seed username '{}' is already taken by "
+                    + "a non-admin account; no ADMIN account exists. Choose a different "
+                    + "app.security.seed.admin-username or resolve the conflict manually.",
+                    username);
+            return;
+        }
         users.save(new AppUser(username, passwordEncoder.encode(password), Role.ADMIN,
                 Instant.now()));
         log.info("Seeded initial ADMIN account '{}'", username);

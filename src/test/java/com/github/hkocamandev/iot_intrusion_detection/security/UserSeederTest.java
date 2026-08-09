@@ -25,7 +25,8 @@ class UserSeederTest {
 
     @Test
     void seedsAdminWhenTableIsEmpty() throws Exception {
-        when(users.count()).thenReturn(0L);
+        when(users.existsByRole(Role.ADMIN)).thenReturn(false);
+        when(users.existsByUsername("admin")).thenReturn(false);
         when(encoder.encode("s3cret-password")).thenReturn("$2a$hash");
 
         seeder("admin", "s3cret-password").run(null);
@@ -39,8 +40,8 @@ class UserSeederTest {
     }
 
     @Test
-    void doesNothingWhenUsersAlreadyExist() throws Exception {
-        when(users.count()).thenReturn(3L);
+    void doesNothingWhenAnAdminAlreadyExists() throws Exception {
+        when(users.existsByRole(Role.ADMIN)).thenReturn(true);
 
         seeder("admin", "s3cret-password").run(null);
 
@@ -53,13 +54,15 @@ class UserSeederTest {
         seeder("admin", "   ").run(null);
 
         verify(users, never()).save(any());
-        // The count query is not even issued when there is nothing to seed with.
+        // Nothing is queried at all when there is nothing to seed with.
         verify(users, never()).count();
+        verify(users, never()).existsByRole(any());
     }
 
     @Test
     void neverLogsOrReturnsThePlaintextPassword() throws Exception {
-        when(users.count()).thenReturn(0L);
+        when(users.existsByRole(Role.ADMIN)).thenReturn(false);
+        when(users.existsByUsername("admin")).thenReturn(false);
         when(encoder.encode("s3cret-password")).thenReturn("$2a$hash");
 
         seeder("admin", "s3cret-password").run(null);
@@ -67,5 +70,30 @@ class UserSeederTest {
         ArgumentCaptor<AppUser> saved = ArgumentCaptor.forClass(AppUser.class);
         verify(users).save(saved.capture());
         assertThat(saved.getValue().getPasswordHash()).isNotEqualTo("s3cret-password");
+    }
+
+    @Test
+    void seedsAdminWhenOtherNonAdminAccountsExistButNoAdminDoes() throws Exception {
+        // Regression: a guard on "any account exists" would wrongly skip seeding here, and
+        // once that happens no ADMIN can ever be created without hand-written SQL.
+        when(users.existsByRole(Role.ADMIN)).thenReturn(false);
+        when(users.existsByUsername("admin")).thenReturn(false);
+        when(encoder.encode("s3cret-password")).thenReturn("$2a$hash");
+
+        seeder("admin", "s3cret-password").run(null);
+
+        ArgumentCaptor<AppUser> saved = ArgumentCaptor.forClass(AppUser.class);
+        verify(users).save(saved.capture());
+        assertThat(saved.getValue().getRole()).isEqualTo(Role.ADMIN);
+    }
+
+    @Test
+    void doesNothingAndLogsErrorWhenSeedUsernameIsTakenByNonAdmin() throws Exception {
+        when(users.existsByRole(Role.ADMIN)).thenReturn(false);
+        when(users.existsByUsername("admin")).thenReturn(true);
+
+        seeder("admin", "s3cret-password").run(null);
+
+        verify(users, never()).save(any());
     }
 }
