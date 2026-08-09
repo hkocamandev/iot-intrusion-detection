@@ -6,6 +6,7 @@ import com.github.hkocamandev.iot_intrusion_detection.llm.LlmOptionsService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -16,7 +17,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+// The Boot 4.1 @WebMvcTest slice builds no security filter chain, so this does not test
+// authorization — it only populates SecurityContextHolder. Access control is covered by
+// SecurityAuthorizationIT.
 @WebMvcTest(LlmOptionsController.class)
+@WithMockUser(roles = "ADMIN")
 class LlmOptionsControllerTest {
 
     @Autowired MockMvc mockMvc;

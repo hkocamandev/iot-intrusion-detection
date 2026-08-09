@@ -11,6 +11,19 @@ LLM layer (alert enrichment + natural-language chat) that runs on a free provide
 
 ## Demo
 
+### Sign in
+
+![Sign in](screenshots/auth-login.png)
+
+JWT-backed sign-in and registration. Accounts live in PostgreSQL with BCrypt hashes; a
+successful sign-in returns a short-lived HS256 token that the dashboard sends on every REST
+call and on the STOMP `CONNECT` frame.
+
+![Role-aware dashboard](screenshots/auth-dashboard.png)
+
+Above: an `ANALYST` session. The role badge and **Sign out** sit in the header, and the
+`Ask 🤖` chat button is absent — the LLM endpoints are `ADMIN`-only.
+
 ### Live dashboard
 
 ![Live dashboard](screenshots/dashboard.png)
@@ -68,7 +81,13 @@ A scheduled poller enriches each alert with a plain-language explanation and rec
 Ask questions in plain language — the assistant tool-calls the alert queries to answer:
 
 ```bash
+# /api/chat is ADMIN-only, so sign in first and send the token.
+TOKEN=$(curl -s -X POST localhost:8080/api/auth/login -H "Content-Type: application/json" \
+  -d '{"username": "admin", "password": "'"$SEED_ADMIN_PASSWORD"'"}' \
+  | python3 -c 'import json,sys; print(json.load(sys.stdin)["token"])')
+
 curl -s -X POST localhost:8080/api/chat -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
   -d '{"question": "Give me an overall threat summary."}'
 # {"answer": "There have been a total of 24 alerts detected, with 12 from rule-based detection
 #   and 12 from machine learning-based detection ... 4 alerts of each type ... 6 of each severity."}
@@ -198,6 +217,72 @@ mid-conversation preserves history. Enrichment always uses the configured defaul
 (`GEMINI_API_KEY` for Gemini, `ANTHROPIC_API_KEY` for Anthropic) in the environment to use LLM features.
 The test suite runs with `app.llm.enabled=false` and requires no API key.
 
+## Phase 6 — Authentication & authorization (JWT)
+
+```
+POST /api/auth/login ─► AuthenticationManager ─► BCrypt ─► HS256 token (1h)
+                                                              │
+ Authorization: Bearer … ─► JwtAuthenticationFilter ─► ROLE_ADMIN | ROLE_ANALYST
+ STOMP CONNECT header   ─► StompAuthChannelInterceptor ─► bound STOMP Principal
+```
+
+Accounts live in an `app_users` table with BCrypt hashes. Login returns a short-lived HS256
+token whose `role` claim becomes the request's single authority, so the request path never
+touches the database — that is what keeps it stateless. There are no refresh tokens: when the
+token expires the next call returns 401 and the dashboard returns to the sign-in page.
+
+The flip side of not reading the database per request: **an already-issued token keeps working
+until it expires, even if the account is deleted or its role is changed.** Revoking access early
+would need a server-side deny-list, which would give up statelessness; with a 1-hour TTL the
+exposure window is bounded instead. Worth knowing before pointing this at anything but a
+single-operator deployment.
+
+| Path | Access |
+|------|--------|
+| `/login.html`, `/index.html`, `/*.js` | anonymous |
+| `POST /api/auth/register`, `POST /api/auth/login` | anonymous |
+| `GET /api/auth/me` | authenticated |
+| `GET /api/alerts`, `GET /api/stats` | `ANALYST` or `ADMIN` |
+| `POST /api/chat`, `GET /api/llm/options` | `ADMIN` only |
+| `/ws` STOMP `CONNECT` | authenticated |
+
+**Registration always creates an `ANALYST`** — a `role` field in the request body is ignored.
+The single `ADMIN` account is seeded from `SEED_ADMIN_PASSWORD` on first startup, and only when
+no accounts exist yet, so it never resets an existing password.
+
+**WebSocket:** a browser cannot attach an `Authorization` header to a WebSocket handshake, so
+the SockJS handshake stays anonymous and the token travels in the STOMP `CONNECT` frame, where
+a `ChannelInterceptor` validates it. This also keeps the token out of URLs and access logs.
+
+**Scope of protection — worth being explicit about.** Static files are served anonymously,
+because no header can be attached to a page navigation or a `<script src>`. The protection is on
+the **data**, not the page: `index.html` loads for anyone, but it renders nothing and redirects
+to `/login.html` until `GET /api/auth/me` confirms a valid token. The token lives in
+`localStorage`, so it is XSS-reachable in principle; the mitigation is the existing output
+escaping on the dashboard and DOMPurify sanitization of assistant markdown. Registration is
+open and unlimited: anyone who can reach the app can create an `ANALYST` account and read every
+alert and every stat, no invitation or approval needed. The ADMIN/ANALYST split protects the LLM
+endpoints, not the alert data — it is not access control over who can see the traffic. Put the
+app behind a network boundary, or disable `POST /api/auth/register` and seed accounts instead,
+if the underlying traffic data is sensitive. `/api/auth/login` and `/api/auth/register` also do
+a BCrypt hash per request with no rate limit or account lockout, which makes them both an
+online brute-force channel and a cheap way to load the server.
+
+**Configuration:**
+
+| Key | Purpose |
+|-----|---------|
+| `app.security.jwt.secret` | HS256 signing key, min 32 bytes. **Required** — the app refuses to start without it (`JWT_SECRET`) |
+| `app.security.jwt.ttl` | Access token lifetime (default `1h`) |
+| `app.security.jwt.issuer` | Expected `iss` claim (default `iot-intrusion-detection`) |
+| `app.security.seed.admin-username` | Seeded admin username (default `admin`) |
+| `app.security.seed.admin-password` | Seeded admin password; seeding is skipped when unset |
+
+```bash
+JWT_SECRET=$(openssl rand -base64 48) SEED_ADMIN_PASSWORD=choose-a-strong-one \
+  ./mvnw spring-boot:run
+```
+
 ## Tech stack
 
 - Java 21, Spring Boot 4.1
@@ -205,6 +290,7 @@ The test suite runs with `app.llm.enabled=false` and requires no API key.
 - PostgreSQL 16 (JSONB feature storage)
 - Testcontainers for integration tests
 - LangChain4j
+- Spring Security 7 with JWT (jjwt) — stateless auth on REST and WebSocket
 - Machine Learning and LLM Support through Python and FastApi
 - Streaming and Security Hardening
 
@@ -219,8 +305,11 @@ Runtime configuration is supplied through environment variables. The committed
    cp .env.example .env
    ```
 
-2. Fill in the values. Everything has a working default that matches the bundled
-   `docker compose` stack. To use the LLM features, choose a provider with
+2. Fill in the values. `JWT_SECRET` is **required** and has no default — generate one with
+   `openssl rand -base64 48`. Set `SEED_ADMIN_PASSWORD` too, or there will be no account to
+   sign in with (registration only creates `ANALYST` accounts). Everything else has a working
+   default that matches the bundled `docker compose` stack. To use the LLM features, choose a
+   provider with
    `APP_LLM_PROVIDER` (`groq` by default, or `gemini` / `anthropic`), set that provider's
    API key (`GROQ_API_KEY` — free at https://console.groq.com — `GEMINI_API_KEY`, or
    `ANTHROPIC_API_KEY`), and set `APP_LLM_ENABLED=true`.
@@ -243,6 +332,8 @@ docker compose up -d        # kafka, kafka-ui (:8085), postgres (:5432)
 set -a; source .env; set +a # load your environment (see Configuration above)
 ./mvnw spring-boot:run      # application (:8080)
 ```
+
+Open `http://localhost:8080/` and sign in with the seeded admin account.
 
 To replay the dataset, see `data/README.md`, then set `app.simulator.enabled=true`.
 
