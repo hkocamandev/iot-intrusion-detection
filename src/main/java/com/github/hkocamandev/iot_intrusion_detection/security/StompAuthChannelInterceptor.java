@@ -18,6 +18,13 @@ import java.util.List;
  * Authenticates the STOMP CONNECT frame. A browser cannot set an Authorization header on a
  * WebSocket handshake, so the token travels in the CONNECT frame instead — which also keeps it
  * out of URLs, access logs and proxy logs. Later frames need no header: the session is bound here.
+ *
+ * <p>Letting every non-CONNECT command pass through unchecked is safe only because of a
+ * framework guarantee this class relies on but does not enforce itself: in spring-websocket
+ * 7.0.8, {@code StompSubProtocolHandler.handleMessageFromClient} registers the session in its
+ * {@code sessions} map only on the CONNECT branch, and every other command asserts that entry
+ * exists. When {@link #preSend} throws for a CONNECT, that entry is removed, so no later
+ * SUBSCRIBE on that socket can reach the broker.
  */
 @Component
 public class StompAuthChannelInterceptor implements ChannelInterceptor {

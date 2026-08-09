@@ -259,7 +259,14 @@ because no header can be attached to a page navigation or a `<script src>`. The 
 the **data**, not the page: `index.html` loads for anyone, but it renders nothing and redirects
 to `/login.html` until `GET /api/auth/me` confirms a valid token. The token lives in
 `localStorage`, so it is XSS-reachable in principle; the mitigation is the existing output
-escaping on the dashboard and DOMPurify sanitization of assistant markdown.
+escaping on the dashboard and DOMPurify sanitization of assistant markdown. Registration is
+open and unlimited: anyone who can reach the app can create an `ANALYST` account and read every
+alert and every stat, no invitation or approval needed. The ADMIN/ANALYST split protects the LLM
+endpoints, not the alert data — it is not access control over who can see the traffic. Put the
+app behind a network boundary, or disable `POST /api/auth/register` and seed accounts instead,
+if the underlying traffic data is sensitive. `/api/auth/login` and `/api/auth/register` also do
+a BCrypt hash per request with no rate limit or account lockout, which makes them both an
+online brute-force channel and a cheap way to load the server.
 
 **Configuration:**
 
