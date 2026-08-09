@@ -75,7 +75,10 @@ class UserSeederTest {
     @Test
     void seedsAdminWhenOtherNonAdminAccountsExistButNoAdminDoes() throws Exception {
         // Regression: a guard on "any account exists" would wrongly skip seeding here, and
-        // once that happens no ADMIN can ever be created without hand-written SQL.
+        // once that happens no ADMIN can ever be created without hand-written SQL. The non-zero
+        // count() is what makes this test discriminate — without it an unstubbed mock returns 0
+        // and the old guard would fall through and pass too.
+        when(users.count()).thenReturn(3L);
         when(users.existsByRole(Role.ADMIN)).thenReturn(false);
         when(users.existsByUsername("admin")).thenReturn(false);
         when(encoder.encode("s3cret-password")).thenReturn("$2a$hash");
