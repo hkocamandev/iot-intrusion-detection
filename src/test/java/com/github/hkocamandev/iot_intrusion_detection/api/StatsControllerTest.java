@@ -14,6 +14,9 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+// The Boot 4.1 @WebMvcTest slice builds no security filter chain, so this does not test
+// authorization — it only populates SecurityContextHolder. Access control is covered by
+// SecurityAuthorizationIT.
 @WebMvcTest(StatsController.class)
 @WithMockUser(roles = "ANALYST")
 class StatsControllerTest {

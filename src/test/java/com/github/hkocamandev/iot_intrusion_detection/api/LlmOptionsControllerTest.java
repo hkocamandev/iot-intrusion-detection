@@ -17,6 +17,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+// The Boot 4.1 @WebMvcTest slice builds no security filter chain, so this does not test
+// authorization — it only populates SecurityContextHolder. Access control is covered by
+// SecurityAuthorizationIT.
 @WebMvcTest(LlmOptionsController.class)
 @WithMockUser(roles = "ADMIN")
 class LlmOptionsControllerTest {

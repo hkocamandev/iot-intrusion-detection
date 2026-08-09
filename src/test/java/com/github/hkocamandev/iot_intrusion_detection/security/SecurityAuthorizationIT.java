@@ -207,6 +207,24 @@ class SecurityAuthorizationIT {
     }
 
     @Test
+    void getOnLoginIsUnauthorized() {
+        // permitAll on /api/auth/login and /api/auth/register is scoped to HttpMethod.POST;
+        // deleting that scoping (matching any method) would leave this test green too, but
+        // pins that GET does not silently inherit the permitAll.
+        assertThat(get("/api/auth/login", null).getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    void errorEndpointIsReachableAnonymously() {
+        // /error is permitAll so a real (authenticated) 500 is not masked as a 401. Its own
+        // status depends on the error attributes present on this request, so only assert that
+        // the filter chain did not reject it.
+        ResponseEntity<String> response = get("/error", null);
+
+        assertThat(response.getStatusCode()).isNotIn(HttpStatus.UNAUTHORIZED, HttpStatus.FORBIDDEN);
+    }
+
+    @Test
     void duplicateRegistrationIsRejected() {
         ResponseEntity<String> response = rest.postForEntity("/api/auth/register",
                 json("{\"username\":\"" + ANALYST_USER + "\",\"password\":\"" + ANALYST_PASSWORD + "\"}"),
