@@ -41,12 +41,12 @@ function prependRow(a) {
 }
 
 async function loadAlerts() {
-  const alerts = await (await fetch('/api/alerts')).json();
+  const alerts = await (await Auth.authFetch('/api/alerts')).json();
   document.getElementById('alert-rows').innerHTML = alerts.map(row).join('');
 }
 
 async function loadStats() {
-  const s = await (await fetch('/api/stats')).json();
+  const s = await (await Auth.authFetch('/api/stats')).json();
   document.getElementById('c-total').textContent = s.total;
   const high = (s.bySeverity.HIGH ?? 0) + (s.bySeverity.CRITICAL ?? 0);
   document.getElementById('c-high').textContent = high;
@@ -58,6 +58,8 @@ async function loadStats() {
 function connect() {
   const client = new StompJs.Client({
     webSocketFactory: () => new SockJS('/ws'),
+    // The browser cannot set headers on the handshake, so the token rides the CONNECT frame.
+    connectHeaders: { Authorization: 'Bearer ' + Auth.token },
     reconnectDelay: 3000
   });
   client.onConnect = () => {
@@ -72,10 +74,28 @@ function connect() {
   client.activate();
 }
 
-charts.type = makeChart('chart-type', 'By attack type');
-charts.severity = makeChart('chart-severity', 'By severity');
-charts.source = makeChart('chart-source', 'RULE vs ML');
-loadAlerts();
-loadStats();
-setInterval(loadStats, 10000);
-connect();
+function renderSession(me) {
+  const badge = document.getElementById('session-role');
+  badge.textContent = me.role;
+  badge.hidden = false;
+  document.getElementById('session-user').textContent = me.username;
+  document.getElementById('sign-out').addEventListener('click', () => Auth.signOut());
+  // The server enforces ADMIN on /api/chat; removing the button is presentation only.
+  if (me.role !== 'ADMIN') {
+    document.getElementById('chat-toggle').remove();
+    document.getElementById('chat-drawer').remove();
+  }
+}
+
+// Nothing loads until the stored token is confirmed with the server; a missing or expired
+// session navigates to /login.html instead of resolving.
+Auth.requireSession().then((me) => {
+  renderSession(me);
+  charts.type = makeChart('chart-type', 'By attack type');
+  charts.severity = makeChart('chart-severity', 'By severity');
+  charts.source = makeChart('chart-source', 'RULE vs ML');
+  loadAlerts();
+  loadStats();
+  setInterval(loadStats, 10000);
+  connect();
+});

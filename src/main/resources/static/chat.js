@@ -86,7 +86,7 @@
     render();
     setBusy(true);
     try {
-      const res = await fetch('/api/chat', {
+      const res = await Auth.authFetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: q, sessionId: state.sessionId, provider: state.provider, model: state.model }),
@@ -156,7 +156,7 @@
 
   async function loadOptions() {
     try {
-      options = await (await fetch('/api/llm/options')).json();
+      options = await (await Auth.authFetch('/api/llm/options')).json();
     } catch (_) { options = { providers: [], defaultProvider: null, defaultModel: null }; }
     renderSelectors();
   }
@@ -207,5 +207,9 @@
     render();
   }
 
-  init();
+  // app.js removes the drawer for non-ADMIN sessions, so init() must not run for them.
+  Auth.requireSession().then((me) => {
+    if (me.role !== 'ADMIN') return;
+    init();
+  });
 })();

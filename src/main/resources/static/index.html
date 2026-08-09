@@ -55,10 +55,26 @@
     .chat-selectors select { flex:1; background:#0f1419; color:#e6e6e6; border:1px solid #2a3442;
       border-radius:6px; padding:0.3rem; font-size:0.8rem; }
     .chat-selectors[hidden] { display:none; }
+    .topbar { display:flex; align-items:center; justify-content:space-between;
+      gap:1rem; flex-wrap:wrap; }
+    .session { display:flex; align-items:center; gap:0.6rem; font-size:0.85rem;
+      color:#8aa0b8; }
+    .role-badge { background:#1b2330; border:1px solid #2a3442; color:#7cc4ff;
+      border-radius:12px; padding:0.15rem 0.6rem; font-size:0.75rem; letter-spacing:0.03em; }
+    .sign-out { background:none; border:1px solid #2a3442; color:#e6e6e6;
+      border-radius:6px; padding:0.25rem 0.6rem; cursor:pointer; font:inherit;
+      font-size:0.8rem; }
   </style>
 </head>
 <body>
-  <h1>IoT Intrusion Detection — Live Dashboard</h1>
+  <div class="topbar">
+    <h1>IoT Intrusion Detection — Live Dashboard</h1>
+    <div class="session">
+      <span id="session-role" class="role-badge" hidden></span>
+      <span id="session-user"></span>
+      <button id="sign-out" class="sign-out" type="button">Sign out</button>
+    </div>
+  </div>
   <div class="counters">
     <div class="card"><div>Total</div><div class="n" id="c-total">0</div></div>
     <div class="card"><div>High+</div><div class="n" id="c-high">0</div></div>
@@ -101,6 +117,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+  <script src="/auth.js"></script>
   <script src="/app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>

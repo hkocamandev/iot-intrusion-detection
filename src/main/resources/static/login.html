@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>IoT Intrusion Detection — Sign in</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; background:#0f1419; color:#e6e6e6;
+      min-height:100vh; display:flex; align-items:center; justify-content:center; }
+    .wrap { width:100%; max-width:360px; padding:1.5rem; }
+    h1 { font-size:1.15rem; text-align:center; margin:0 0 1.2rem; font-weight:600; }
+    .card { background:#1b2330; border:1px solid #2a3442; border-radius:8px; padding:1.2rem; }
+    .tabs { display:flex; gap:0.4rem; margin-bottom:1rem; }
+    .tab { flex:1; background:none; border:1px solid #2a3442; color:#8aa0b8;
+      border-radius:6px; padding:0.4rem; cursor:pointer; font:inherit; font-size:0.85rem; }
+    .tab.active { background:#0f1419; color:#e6e6e6; border-color:#4f8cff; }
+    label { display:block; font-size:0.8rem; color:#8aa0b8; margin:0.7rem 0 0.25rem; }
+    input { width:100%; box-sizing:border-box; background:#0f1419; color:#e6e6e6;
+      border:1px solid #2a3442; border-radius:8px; padding:0.5rem; font:inherit; }
+    input:focus { outline:none; border-color:#4f8cff; }
+    .submit { width:100%; margin-top:1.1rem; background:#4f8cff; color:#fff; border:none;
+      border-radius:8px; padding:0.6rem; font:inherit; font-weight:600; cursor:pointer; }
+    .submit:disabled { opacity:0.5; cursor:not-allowed; }
+    .msg { margin-top:0.8rem; font-size:0.85rem; min-height:1.1em; }
+    .msg.error { color:#ff6b6b; }
+    .msg.ok { color:#7cc4ff; }
+    .hint { margin-top:0.9rem; font-size:0.75rem; color:#8aa0b8; text-align:center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>IoT Intrusion Detection</h1>
+    <div class="card">
+      <div class="tabs">
+        <button id="tab-login" class="tab active" type="button">Sign in</button>
+        <button id="tab-register" class="tab" type="button">Register</button>
+      </div>
+      <form id="auth-form" autocomplete="on">
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" required autocomplete="username"/>
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required
+               autocomplete="current-password"/>
+        <button id="submit" class="submit" type="submit">Sign in</button>
+      </form>
+      <div id="msg" class="msg" role="status" aria-live="polite"></div>
+      <div id="hint" class="hint" hidden>New accounts are created with the ANALYST role.</div>
+    </div>
+  </div>
+
+  <script src="/auth.js"></script>
+  <script>
+    (() => {
+      'use strict';
+
+      let mode = 'login';
+
+      const form = document.getElementById('auth-form');
+      const submit = document.getElementById('submit');
+      const msg = document.getElementById('msg');
+      const hint = document.getElementById('hint');
+      const tabLogin = document.getElementById('tab-login');
+      const tabRegister = document.getElementById('tab-register');
+      const password = document.getElementById('password');
+
+      const ERRORS = {
+        invalid_credentials: 'Invalid credentials.',
+        username_taken: 'That username is already taken.',
+        validation_failed: 'Username needs 3+ characters and password 8+.',
+        unauthorized: 'Invalid credentials.',
+      };
+
+      function setMode(next) {
+        mode = next;
+        const registering = mode === 'register';
+        tabLogin.classList.toggle('active', !registering);
+        tabRegister.classList.toggle('active', registering);
+        submit.textContent = registering ? 'Create account' : 'Sign in';
+        password.autocomplete = registering ? 'new-password' : 'current-password';
+        hint.hidden = !registering;
+        show('', '');
+      }
+
+      function show(text, kind) {
+        msg.textContent = text;
+        msg.className = kind ? 'msg ' + kind : 'msg';
+      }
+
+      async function submitForm(event) {
+        event.preventDefault();
+        submit.disabled = true;
+        show('', '');
+        const body = JSON.stringify({
+          username: document.getElementById('username').value,
+          password: password.value,
+        });
+        try {
+          const path = mode === 'register' ? '/api/auth/register' : '/api/auth/login';
+          const res = await fetch(path, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body,
+          });
+          let data = {};
+          try { data = await res.json(); } catch (_) { data = {}; }
+          if (!res.ok) {
+            show(ERRORS[data.error] || 'Sign-in failed, please try again.', 'error');
+            return;
+          }
+          if (mode === 'register') {
+            show('Account created. You can sign in now.', 'ok');
+            setMode('login');
+            return;
+          }
+          Auth.save(data);
+          location.replace('/index.html');
+        } catch (_) {
+          show('Network error, please retry.', 'error');
+        } finally {
+          submit.disabled = false;
+        }
+      }
+
+      tabLogin.addEventListener('click', () => setMode('login'));
+      tabRegister.addEventListener('click', () => setMode('register'));
+      form.addEventListener('submit', submitForm);
+    })();
+  </script>
+</body>
+</html>

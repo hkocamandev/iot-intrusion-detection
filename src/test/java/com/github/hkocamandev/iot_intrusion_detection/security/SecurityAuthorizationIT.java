@@ -75,11 +75,18 @@ class SecurityAuthorizationIT {
     @Test
     void staticPagesAreAnonymous() {
         assertThat(rest.getForEntity("/", String.class).getStatusCode()).isEqualTo(HttpStatus.OK);
-        // /login.html is created in Task 8. What this asserts today is the security rule, not the
-        // file: an anonymous GET must reach the resource handler (404 while the page is missing)
-        // rather than be refused by the filter chain. Task 8 tightens this to OK.
         assertThat(rest.getForEntity("/login.html", String.class).getStatusCode())
-                .isNotIn(HttpStatus.UNAUTHORIZED, HttpStatus.FORBIDDEN);
+                .isEqualTo(HttpStatus.OK);
+        assertThat(rest.getForEntity("/index.html", String.class).getStatusCode())
+                .isEqualTo(HttpStatus.OK);
+        // The /*.js permitAll glob is single-segment; these are the real script URLs the
+        // dashboard requests, so a regression in that matcher breaks the page, not just a test.
+        assertThat(rest.getForEntity("/auth.js", String.class).getStatusCode())
+                .isEqualTo(HttpStatus.OK);
+        assertThat(rest.getForEntity("/app.js", String.class).getStatusCode())
+                .isEqualTo(HttpStatus.OK);
+        assertThat(rest.getForEntity("/chat.js", String.class).getStatusCode())
+                .isEqualTo(HttpStatus.OK);
     }
 
     @Test
@@ -134,6 +141,12 @@ class SecurityAuthorizationIT {
     @Test
     void anonymousChatIsUnauthorizedNotForbidden() {
         assertThat(post("/api/chat", null, "{\"question\":\"anything\"}").getStatusCode())
+                .isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    void anonymousLlmOptionsIsUnauthorizedNotForbidden() {
+        assertThat(get("/api/llm/options", null).getStatusCode())
                 .isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
