@@ -4,11 +4,12 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    # Version-update PRs for minor and patch releases only; major upgrades
-    # need code changes and are done deliberately. Security updates are not
-    # affected by this rule and still arrive for any version.
+    # Version-update PRs for direct dependencies, minor and patch releases
+    # only. Major upgrades need code changes and are done deliberately;
+    # transitive packages move with their parents. Security updates are not
+    # affected by this rule and still arrive for any version or dependency.
     allow:
-      - dependency-name: "*"
+      - dependency-type: direct
         update-types:
           - version-update:semver-minor
           - version-update:semver-patch
@@ -16,11 +17,12 @@ updates:
     directory: /ml-service
     schedule:
       interval: weekly
-    # Version-update PRs for minor and patch releases only; major upgrades
-    # need code changes and are done deliberately. Security updates are not
-    # affected by this rule and still arrive for any version.
+    # Version-update PRs for direct dependencies, minor and patch releases
+    # only. Major upgrades need code changes and are done deliberately;
+    # transitive packages move with their parents. Security updates are not
+    # affected by this rule and still arrive for any version or dependency.
     allow:
-      - dependency-name: "*"
+      - dependency-type: direct
         update-types:
           - version-update:semver-minor
           - version-update:semver-patch
@@ -28,11 +30,12 @@ updates:
     directory: /ml-service
     schedule:
       interval: weekly
-    # Version-update PRs for minor and patch releases only; major upgrades
-    # need code changes and are done deliberately. Security updates are not
-    # affected by this rule and still arrive for any version.
+    # Version-update PRs for direct dependencies, minor and patch releases
+    # only. Major upgrades need code changes and are done deliberately;
+    # transitive packages move with their parents. Security updates are not
+    # affected by this rule and still arrive for any version or dependency.
     allow:
-      - dependency-name: "*"
+      - dependency-type: direct
         update-types:
           - version-update:semver-minor
           - version-update:semver-patch
@@ -40,11 +43,12 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    # Version-update PRs for minor and patch releases only; major upgrades
-    # need code changes and are done deliberately. Security updates are not
-    # affected by this rule and still arrive for any version.
+    # Version-update PRs for direct dependencies, minor and patch releases
+    # only. Major upgrades need code changes and are done deliberately;
+    # transitive packages move with their parents. Security updates are not
+    # affected by this rule and still arrive for any version or dependency.
     allow:
-      - dependency-name: "*"
+      - dependency-type: direct
         update-types:
           - version-update:semver-minor
           - version-update:semver-patch
