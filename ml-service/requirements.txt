@@ -5,7 +5,7 @@ scikit-learn==1.5.2
 pandas==2.2.3
 numpy==2.5.4
 joblib==1.6.0
-pytest==9.0.3
+pytest==9.1.1
 httpx==0.27.2
 
 # Security floors for transitive dependencies (not imported directly).
