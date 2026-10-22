@@ -13,6 +13,14 @@ updates:
         update-types:
           - version-update:semver-minor
           - version-update:semver-patch
+    # One weekly PR per ecosystem instead of one per package; also avoids
+    # lockfile conflicts between sibling PRs. Security updates stay separate.
+    groups:
+      minor-and-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
   - package-ecosystem: pip
     directory: /ml-service
     schedule:
@@ -26,6 +34,14 @@ updates:
         update-types:
           - version-update:semver-minor
           - version-update:semver-patch
+    # One weekly PR per ecosystem instead of one per package; also avoids
+    # lockfile conflicts between sibling PRs. Security updates stay separate.
+    groups:
+      minor-and-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
   - package-ecosystem: docker
     directory: /ml-service
     schedule:
@@ -39,6 +55,14 @@ updates:
         update-types:
           - version-update:semver-minor
           - version-update:semver-patch
+    # One weekly PR per ecosystem instead of one per package; also avoids
+    # lockfile conflicts between sibling PRs. Security updates stay separate.
+    groups:
+      minor-and-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
   - package-ecosystem: docker-compose
     directory: /
     schedule:
@@ -52,3 +76,11 @@ updates:
         update-types:
           - version-update:semver-minor
           - version-update:semver-patch
+    # One weekly PR per ecosystem instead of one per package; also avoids
+    # lockfile conflicts between sibling PRs. Security updates stay separate.
+    groups:
+      minor-and-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
