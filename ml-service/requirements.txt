@@ -6,7 +6,7 @@ pandas==2.2.3
 numpy==2.5.4
 joblib==1.6.0
 pytest==9.0.3
-httpx==0.27.2
+httpx==0.28.1
 
 # Security floors for transitive dependencies (not imported directly).
 starlette>=1.9.0
