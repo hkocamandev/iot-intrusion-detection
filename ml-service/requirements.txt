@@ -11,7 +11,7 @@ httpx==0.28.1
 # Security floors for transitive dependencies (not imported directly).
 starlette>=1.9.0
 anyio>=4.15.1
-idna>=3.15
+idna>=3.20
 certifi>=2026.10.19
 scipy>=1.18.1
 pygments>=2.21.0
