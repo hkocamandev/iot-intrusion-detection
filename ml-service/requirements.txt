@@ -1,11 +1,11 @@
-fastapi==0.159.1
+fastapi==0.162.0
 uvicorn[standard]==0.54.0
 xgboost==2.1.4
 scikit-learn==1.9.1
 pandas==2.3.3
 numpy==2.5.4
 joblib==1.6.0
-pytest==9.1.1
+pytest==9.2.0
 httpx==0.28.1
 
 # Security floors for transitive dependencies (not imported directly).
